@@ -1,101 +1,56 @@
-import Image from "next/image";
+export const dynamic = 'force-static';
 
-export default function Home() {
+function AdBanner() {
+  // 審査不要な自社/提携バナー想定（静的画像リンク）。AdSense等を使う場合は差し替え。
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="rounded-xl border bg-white p-4 flex items-center justify-between">
+      <div className="text-xs text-slate-600">※このページには広告が含まれます</div>
+      <a href="#" aria-label="スポンサーリンク" className="inline-flex items-center gap-3">
+        <img src="/banner-sample.svg" alt="スポンサー" className="h-8 w-auto" />
+        <span className="text-sm text-slate-700 hover:underline">スポンサー募集 / 掲載について</span>
+      </a>
+    </div>
+  );
+}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+export default function LandingPage() {
+  return (
+    <div>
+      <section className="bg-gradient-to-b from-sky-50 to-slate-50">
+        <div className="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight">見積・発注・契約・請求・領収を、<br/>ブラウザだけでサッと作成</h1>
+            <p className="mt-4 text-slate-700">保存なし・その場で印刷/PDF。URL共有にも対応。個人事業主や小規模事業向けの超シンプル帳票ツールです。</p>
+            <div className="mt-6 flex gap-3">
+              <a className="inline-flex items-center justify-center rounded-xl border border-transparent bg-sky-600 px-4 py-2 text-white hover:bg-sky-700" href="/app">アプリを開く（無料）</a>
+              <a className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-slate-700 hover:bg-slate-50" href="/how-to">使い方を見る</a>
+            </div>
+            <p className="mt-3 text-xs text-slate-500">※ 現在β版：入力内容はサーバに保存されません。共有リンクに入力情報が含まれます。</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border p-4">
+            <img src="/og-preview.svg" alt="画面イメージ" className="rounded-lg w-full h-auto"/>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-3 gap-6">
+        <div className="bg-white border rounded-2xl p-5">
+          <h3 className="font-semibold">保存なしで安心スタート</h3>
+          <p className="mt-2 text-sm text-slate-700">まずはPDF出力だけ。面倒なアカウント作成や審査なしで使い始められます。</p>
+        </div>
+        <div className="bg-white border rounded-2xl p-5">
+          <h3 className="font-semibold">URL共有OK</h3>
+          <p className="mt-2 text-sm text-slate-700">入力内容はURLハッシュにエンコード。保存しない運用でも、相手と素早く共有できます。</p>
+        </div>
+        <div className="bg-white border rounded-2xl p-5">
+          <h3 className="font-semibold">インボイス対応レイアウト</h3>
+          <p className="mt-2 text-sm text-slate-700">登録番号や税率別集計など、基本項目を網羅。※最終確認は各自でお願いします。</p>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 pb-12">
+        <AdBanner />
+      </section>
     </div>
   );
 }

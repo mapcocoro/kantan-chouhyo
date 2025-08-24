@@ -1,0 +1,31 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+  
+  <!-- Header -->
+  <rect x="20" y="20" width="360" height="40" fill="#0ea5e9" rx="8"/>
+  <text x="200" y="44" font-family="sans-serif" font-size="16" fill="white" text-anchor="middle">軽量請求（β）</text>
+  
+  <!-- Form fields -->
+  <rect x="40" y="80" width="120" height="25" fill="#e0e7ff" rx="4"/>
+  <text x="45" y="97" font-family="sans-serif" font-size="10" fill="#4338ca">帳票タイプ</text>
+  
+  <rect x="180" y="80" width="120" height="25" fill="#e0e7ff" rx="4"/>
+  <text x="185" y="97" font-family="sans-serif" font-size="10" fill="#4338ca">書類番号</text>
+  
+  <rect x="320" y="80" width="60" height="25" fill="#e0e7ff" rx="4"/>
+  <text x="325" y="97" font-family="sans-serif" font-size="10" fill="#4338ca">発行日</text>
+  
+  <!-- Table -->
+  <rect x="40" y="120" width="320" height="120" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="200" y="140" font-family="sans-serif" font-size="12" fill="#374151" text-anchor="middle">明細表</text>
+  
+  <!-- Lines -->
+  <line x1="40" y1="150" x2="360" y2="150" stroke="#e2e8f0"/>
+  <line x1="40" y1="170" x2="360" y2="170" stroke="#e2e8f0"/>
+  <line x1="40" y1="190" x2="360" y2="190" stroke="#e2e8f0"/>
+  <line x1="40" y1="210" x2="360" y2="210" stroke="#e2e8f0"/>
+  
+  <!-- Button -->
+  <rect x="260" y="260" width="100" height="30" fill="#0ea5e9" rx="6"/>
+  <text x="310" y="279" font-family="sans-serif" font-size="12" fill="white" text-anchor="middle">印刷/PDF</text>
+</svg>
