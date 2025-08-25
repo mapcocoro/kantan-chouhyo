@@ -28,3 +28,21 @@ body {
   /* 文章幅（行長）を抑える。必要に応じて md:max-w-2xl/3xl を併用 */
   .measure      { max-width: 68ch; }
 }
+
+/* === 全体縮小（約 80〜85%）=== */
+html { font-size: 13px; }             /* 16px→13px ≒ 81.25% */
+
+/* 画面が狭い端末では少しだけ戻す（読みやすさ優先） */
+@media (max-width: 480px) {
+  html { font-size: 14px; }           /* ≒ 87.5% */
+}
+
+/* === コンパクト化クラス === */
+.form-compact { font-size: 0.875rem; }             /* text-sm */
+.form-compact .control {
+  height: 2.25rem;                                  /* h-9 */
+  padding: 0.5rem 0.75rem;                          /* py-2 px-3 */
+  line-height: 1.25rem;                             /* leading-tight */
+}
+.form-compact .label { font-size: 0.8125rem; }      /* text-xs寄り */
+.form-compact .hint  { font-size: 0.75rem; opacity: .8; }

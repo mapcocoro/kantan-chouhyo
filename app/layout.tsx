@@ -4,7 +4,7 @@ import { CONTACT_EMAIL, CONTACT_MAILTO } from "./config/contact";
 import { IS_BETA } from "./config/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://kantan-chouhyo.vercel.app'),
+  metadataBase: new URL('https://chouhyo.cocoroai.co.jp'),
   title: "かんたん帳票 — ブラウザだけで、見積→請求→PDF。",
   description: "保存なし・その場で印刷/PDF。URL共有対応。個人事業主や小規模事業向けの超シンプル帳票ツール。",
   manifest: "/site.webmanifest",

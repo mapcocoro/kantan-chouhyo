@@ -40,6 +40,9 @@ select.input, textarea.input {
 
 @page{ size: A4; margin: 12mm; }
 @media print{ 
+  /* 印刷／PDFは等倍に戻す（レイアウト崩れ防止） */
+  html { font-size: 16px !important; }
+  
   /* 印刷時は紙面(#print-area)だけ可視化し、アプリのヘッダー等は排除 */
   body * { visibility: hidden !important; }
   #print-area, #print-area * { visibility: visible !important; }

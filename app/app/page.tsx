@@ -137,6 +137,21 @@ export default function DocumentMaker(){
     localStorage.setItem('document-maker-data', JSON.stringify(st));
   }, [st]);
 
+  // ジャンプボタンの表示制御
+  useEffect(() => {
+    const btn = document.getElementById('jumpPreview');
+    const pv = document.getElementById('preview');
+    if (!btn || !pv) return;
+
+    const io = new IntersectionObserver(([entry]) => {
+      // プレビューが見えている間はボタンを隠す
+      btn.style.display = entry.isIntersecting ? 'none' : 'flex';
+    }, { threshold: 0.2 });
+
+    io.observe(pv);
+    return () => io.disconnect();
+  }, []);
+
   // 期日プリセット
   function applyTerms(term: 'NET14'|'NET30'|'EOM30'|'EOM60'){
     const issue = new Date(st.issueDate);
@@ -217,17 +232,33 @@ export default function DocumentMaker(){
 
   // テンプレ: 各帳票に合わせてフィールドの見え方だけ切替
   return (
-    <div className="min-h-screen bg-slate-50"> 
-      <div className="max-w-6xl mx-auto p-3 sm:p-6">
-        <h1 className="text-xl sm:text-2xl font-semibold mb-4 no-print text-center sm:text-left">かんたん帳票</h1>
+    <div className="min-h-screen bg-slate-50">
+      {/* タブ風ナビゲーション */}
+      <nav className="sticky top-0 z-30 bg-slate-50/75 backdrop-blur border-b no-print">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex gap-3 text-sm">
+          <a href="#form" className="px-3 py-1.5 rounded-md border bg-white hover:bg-slate-50 transition-colors">入力フォーム</a>
+          <a href="#preview" className="px-3 py-1.5 rounded-md border bg-white hover:bg-slate-50 transition-colors">プレビュー</a>
+        </div>
+      </nav>
 
-        {/* 帳票タイプ選択 - 最初に目立つように配置 */}
-        <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6 no-print">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-2xl">📄</span>
-            <label className="text-lg font-bold text-blue-800">まず帳票タイプを選択してください</label>
+      {/* 分割レイアウト */}
+      <div className="max-w-7xl mx-auto px-4 lg:grid lg:grid-cols-[minmax(600px,1fr)_minmax(520px,0.9fr)] lg:gap-6">
+        {/* フォーム部分 */}
+        <section id="form" className="form-compact py-4">
+          <h1 className="text-lg font-semibold mb-3 no-print">かんたん帳票</h1>
+
+          {/* モバイル用ガイダンス */}
+          <div className="mb-3 rounded-md border bg-slate-50 px-3 py-2 text-xs text-slate-600 lg:hidden no-print">
+            下にプレビューが表示されます。右下の「プレビューへ」ボタンでジャンプできます。
           </div>
-          <select className="w-full px-4 py-3 text-lg font-semibold border-2 border-blue-400 rounded-lg bg-white hover:border-blue-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition-colors" value={st.docType} onChange={e=>{
+
+          {/* 帳票タイプ選択 - 最初に目立つように配置 */}
+          <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-3 mb-4 no-print">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xl">📄</span>
+              <label className="text-base font-bold text-blue-800">まず帳票タイプを選択してください</label>
+            </div>
+            <select className="w-full px-3 py-2 text-base font-semibold border-2 border-blue-400 rounded-lg bg-white hover:border-blue-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition-colors control" value={st.docType} onChange={e=>{
               const newType = e.target.value as DocType;
               const prefixMap = {
                 quote: 'QTE-YYYYMM-001',
@@ -244,27 +275,27 @@ export default function DocumentMaker(){
               <option value="invoice">請求書</option>
               <option value="receipt">領収書</option>
             </select>
-        </div>
+          </div>
 
-        {/* その他のコントロール群 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 no-print">
-          <div>
-            <label className="block text-sm font-semibold text-blue-700 mb-1">
-              🔢 書類番号
-              <span className="ml-1 relative inline-block group">
-                <span className="cursor-help inline-flex items-center justify-center w-4 h-4 text-xs bg-gray-300 text-gray-600 rounded-full hover:bg-gray-400 hover:text-white transition-colors">?</span>
-                <span className="absolute left-0 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
-                  お客様独自の管理番号を自由に設定できます。<br/>
-                  例：INV-2025-001、請求書No.001など
+          {/* その他のコントロール群 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 no-print">
+            <div>
+              <label className="block label font-semibold text-blue-700 mb-1">
+                🔢 書類番号
+                <span className="ml-1 relative inline-block group">
+                  <span className="cursor-help inline-flex items-center justify-center w-4 h-4 text-xs bg-gray-300 text-gray-600 rounded-full hover:bg-gray-400 hover:text-white transition-colors">?</span>
+                  <span className="absolute left-0 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                    お客様独自の管理番号を自由に設定できます。<br/>
+                    例：INV-2025-001、請求書No.001など
+                  </span>
                 </span>
-              </span>
-            </label>
-            <input className="input" placeholder="例：INV-2025-001" value={st.number} onChange={e=>setSt({...st, number:e.target.value})} />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-blue-700 mb-1">📅 発行日</label>
-            <input type="date" className="input" value={st.issueDate} onChange={e=>setSt({...st, issueDate: e.target.value})} />
-          </div>
+              </label>
+              <input className="input control" placeholder="例：INV-2025-001" value={st.number} onChange={e=>setSt({...st, number:e.target.value})} />
+            </div>
+            <div>
+              <label className="block label font-semibold text-blue-700 mb-1">📅 発行日</label>
+              <input type="date" className="input control" value={st.issueDate} onChange={e=>setSt({...st, issueDate: e.target.value})} />
+            </div>
         </div>
 
         {/* 取引先/発行者 */}
@@ -568,34 +599,54 @@ export default function DocumentMaker(){
           </fieldset>
         </div>
 
-        {/* ボタン */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6 sm:mb-8">
-          <button className="btn" onClick={()=>triggerPrint()}>
-            <span className="hidden sm:inline">印刷 / PDF保存</span>
-            <span className="sm:hidden">印刷・PDF</span>
-          </button>
-          <button className="btn-secondary" onClick={copyShare}>
-            <span className="hidden sm:inline">共有リンクをコピー</span>
-            <span className="sm:hidden">リンク共有</span>
-          </button>
-          <button className="btn-secondary" onClick={()=>{setSt(EMPTY); localStorage.removeItem('document-maker-data');}}>リセット</button>
-          <button className="btn-secondary" onClick={()=>localStorage.removeItem('document-maker-data')}>
-            <span className="hidden sm:inline">保存データを削除</span>
-            <span className="sm:hidden">データ削除</span>
-          </button>
-        </div>
-
-        {/* プレビュー */}
-        <div id="print-area" className="bg-white shadow-sm rounded-2xl p-4 sm:p-8 print:p-0 print:shadow-none">
-          <div className="text-center mb-4 sm:hidden no-print">
-            <h3 className="text-lg font-semibold text-slate-700">プレビュー</h3>
-            <p className="text-xs text-slate-500 mt-1">実際の印刷イメージです</p>
+          {/* ボタン */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+            <button className="btn" onClick={()=>triggerPrint()}>
+              <span className="hidden sm:inline">印刷 / PDF保存</span>
+              <span className="sm:hidden">印刷・PDF</span>
+            </button>
+            <button className="btn-secondary" onClick={copyShare}>
+              <span className="hidden sm:inline">共有リンクをコピー</span>
+              <span className="sm:hidden">リンク共有</span>
+            </button>
+            <button className="btn-secondary" onClick={()=>{setSt(EMPTY); localStorage.removeItem('document-maker-data');}}>リセット</button>
+            <button className="btn-secondary" onClick={()=>localStorage.removeItem('document-maker-data')}>
+              <span className="hidden sm:inline">保存データを削除</span>
+              <span className="sm:hidden">データ削除</span>
+            </button>
           </div>
-          <div className="a4 text-xs sm:text-sm">
+        </section>
+
+        {/* デスクトップ用プレビュー（右側固定） */}
+        <aside className="hidden lg:block sticky top-20 h-[calc(100vh-6rem)] overflow-auto rounded-xl border bg-white shadow-sm p-4">
+          <h3 className="mb-3 text-sm font-semibold text-slate-600 no-print">プレビュー</h3>
+          <div id="print-area" className="print:p-0">
+            <div className="a4 text-xs sm:text-sm">
+              <DocPreview st={st} totals={totals} />
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {/* モバイル用プレビュー（下段） */}
+      <section id="preview" className="lg:hidden mt-6 px-4">
+        <h3 className="mb-2 text-sm font-semibold text-slate-600 no-print">プレビュー</h3>
+        <div className="bg-white shadow-sm rounded-2xl p-4 print:p-0 print:shadow-none">
+          <div id="print-area-mobile" className="a4 text-xs sm:text-sm">
             <DocPreview st={st} totals={totals} />
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* 右下ジャンプボタン（モバイル用） */}
+      <button
+        id="jumpPreview"
+        onClick={() => document.getElementById('preview')?.scrollIntoView({ behavior: 'smooth' })}
+        className="fixed bottom-5 right-5 lg:hidden flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-white shadow-lg z-20 transition-all"
+        style={{ display: 'flex' }}
+      >
+        ↓ プレビューへ
+      </button>
     </div>
   );
 }
