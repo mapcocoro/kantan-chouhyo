@@ -64,6 +64,7 @@ type State = {
   subject?: string;
   issueDate: string; // YYYY-MM-DD
   dueDate?: string;  // invoiceのみ任意
+  expiryDate?: string; // 見積書の有効期限
   payerTerms?: string; // 支払条件テキスト
   orderDate?: string; orderNo?: string; deliveryDate?: string; // 発注/契約用
   parties: { issuer: Party; customer: Party };
@@ -375,15 +376,38 @@ export default function DocumentMaker(){
                 </div>
               </>
             )}
+            {st.docType==='quote' && (
+              <div>
+                <label className="block text-sm font-semibold text-blue-700 mb-1">📅 有効期限（任意）</label>
+                <input type="date" className="input" value={st.expiryDate||''} onChange={e=>setSt({...st, expiryDate:e.target.value})} />
+              </div>
+            )}
             {st.docType==='po' && (
               <>
                 <div>
                   <label className="block text-sm font-semibold text-blue-700 mb-1">📅 発注日</label>
                   <input type="date" className="input" value={st.orderDate||st.issueDate} onChange={e=>setSt({...st, orderDate:e.target.value})} />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-blue-700 mb-1">📅 納期</label>
-                  <input type="date" className="input" value={st.deliveryDate||''} onChange={e=>setSt({...st, deliveryDate:e.target.value})} />
+                <div className={`${!st.deliveryDate ? 'animate-pulse' : ''}`}>
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">
+                    📅 納期 {!st.deliveryDate && <span className="text-red-500 text-xs">（必須）</span>}
+                  </label>
+                  <input type="date" className={`input ${!st.deliveryDate ? 'border-red-400 bg-red-50' : ''}`} value={st.deliveryDate||''} onChange={e=>setSt({...st, deliveryDate:e.target.value})} />
+                  {!st.deliveryDate && <div className="text-xs text-red-500 mt-1">⚠️ 納期を入力してください</div>}
+                </div>
+                <div className={`${!st.payerTerms ? 'animate-pulse' : ''}`}>
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">
+                    💳 支払条件 {!st.payerTerms && <span className="text-red-500 text-xs">（必須）</span>}
+                  </label>
+                  <select className={`input ${!st.payerTerms ? 'border-red-400 bg-red-50' : ''}`} onChange={e=>applyTerms(e.target.value as 'NET14'|'NET30'|'EOM30'|'EOM60')} defaultValue="">
+                    <option value="">⚠️ 支払条件を選択してください</option>
+                    <option value="NET14">Net 14</option>
+                    <option value="NET30">Net 30</option>
+                    <option value="EOM30">当月末締/翌月末</option>
+                    <option value="EOM60">当月末締/翌々月末</option>
+                  </select>
+                  {!st.payerTerms && <div className="text-xs text-red-500 mt-1">⚠️ 支払条件を選択してください</div>}
+                  <div className="text-xs text-slate-600 mt-1">{st.payerTerms||''}</div>
                 </div>
               </>
             )}
@@ -698,6 +722,7 @@ function QuoteDoc({ st, totals }:{ st:State; totals: ReturnType<typeof useTotals
         <div className="text-sm text-right">
           <div>書類番号：{st.number}</div>
           <div>発行日：{fmtDate(st.issueDate)}</div>
+          {st.expiryDate && <div>有効期限：{fmtDate(st.expiryDate)}</div>}
         </div>
       </div>
       
@@ -767,6 +792,7 @@ function PODoc({ st }:{ st:State }){
           <div>発注日：{fmtDate(st.orderDate||st.issueDate)}</div>
           <div>発注番号：{st.number}</div>
           {st.deliveryDate && <div>納期：{fmtDate(st.deliveryDate)}</div>}
+          {st.payerTerms && <div>支払条件：{st.payerTerms}</div>}
         </div>
       </div>
 
@@ -869,6 +895,7 @@ function ReceiptDoc({ st, totals }:{ st:State; totals: ReturnType<typeof useTota
       <StampIssuer st={st} />
 
       <div className="mt-10 text-xs text-slate-500">（収入印紙は必要に応じて貼付）</div>
+      <div className="mt-2 text-xs text-slate-500">※銀行振込の場合は、金融機関の振込明細をもって領収に代えさせていただきます。</div>
     </div>
   );
 }
