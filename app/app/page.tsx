@@ -450,7 +450,7 @@ export default function DocumentMaker(){
 
         {/* 明細 - 帳票タイプに応じてスタイル切り替え */}
         {(st.docType==='quote' || st.docType==='po' || st.docType==='invoice' || st.docType==='receipt') && (
-          <div className={`mb-6 no-print ${st.docType === 'contract' ? 'opacity-60' : ''}`}>
+          <div className="mb-6 no-print">
             <div className="flex items-center justify-between mb-2">
               <h2 className={`text-lg font-semibold ${st.docType === 'receipt' ? 'text-gray-500' : ''}`}>
                 明細 
