@@ -1,0 +1,64 @@
+/* Component styles */
+.input{ 
+  @apply w-full rounded-2xl border-2 border-blue-300 px-3 py-3 sm:py-2 bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-500 text-base; 
+  min-height: 44px;
+  transition: all 0.2s ease-in-out;
+}
+.input:focus, .input:not(:placeholder-shown) {
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.input:not(:placeholder-shown) {
+  box-shadow: none;
+}
+.btn{ 
+  @apply inline-flex items-center justify-center rounded-xl border border-transparent bg-sky-600 px-4 py-3 sm:py-2 text-white hover:bg-sky-700 active:bg-sky-800 text-base font-medium; 
+  min-height: 44px;
+  touch-action: manipulation;
+}
+.btn-secondary{ 
+  @apply inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 sm:py-2 text-slate-700 hover:bg-slate-50 text-base font-medium; 
+  min-height: 44px;
+  touch-action: manipulation;
+}
+.card{ @apply border-2 border-blue-200 rounded-2xl p-3 sm:p-4 bg-blue-50 space-y-3 sm:space-y-2; }
+.legend{ @apply text-sm font-semibold mb-2 sm:mb-1 text-blue-800; }
+.a4{ width:100%; max-width:794px; min-height:1123px; margin:0 auto; }
+
+/* スマホでのタッチ操作改善 */
+select.input, textarea.input {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* スマホでのズーム無効化（入力フィールドのフォーカス時） */
+@media screen and (max-width: 768px) {
+  .input {
+    font-size: 16px !important;
+  }
+}
+
+@page{ size: A4; margin: 12mm; }
+@media print{ 
+  /* 印刷時は紙面(#print-area)だけ可視化し、アプリのヘッダー等は排除 */
+  body * { visibility: hidden !important; }
+  #print-area, #print-area * { visibility: visible !important; }
+  
+  #print-area {
+    position: fixed !important; 
+    inset: 0 !important; 
+    margin: 0 !important;
+    box-shadow: none !important; 
+    border: none !important;
+    background: white !important;
+    padding: 0 !important;
+  }
+  
+  /* リンク後ろのURLを出さない（Safari等） */
+  a[href]::after { content: "" !important; }
+  
+  .btn,.btn-secondary,.card,.input, select, textarea, legend, label { display:none !important } 
+  .no-print { display:none !important }
+  body{ background:#fff } 
+  .a4{ width:auto; min-height:auto; margin: 0; } 
+}

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
+import './styles.css';
 
 // ------------------------------------------------------------
 // 超シンプル帳票ジェネレーター（保存なし・URL共有・印刷）
@@ -8,6 +9,32 @@ import React, { useEffect, useMemo, useState } from "react";
 // - 特徴: サーバ不要 / データ保存なし / URLに埋め込んで共有可 / 印刷→PDF保存
 // - 使い方: このコンポーネントを Next.js の app/page.tsx に貼るだけで動作
 // ------------------------------------------------------------
+
+// 印刷時にブラウザヘッダー（日時・タイトル・URL）を自動で無効化
+function useHideBrowserPrintHeader() {
+  const prevTitle = useRef<string | null>(null);
+  const blank = () => { prevTitle.current = document.title; document.title = "\u200B"; }; // ゼロ幅スペース
+  const restore = () => { if (prevTitle.current != null) document.title = prevTitle.current; };
+  
+  useEffect(() => {
+    const before = () => blank();
+    const after = () => restore();
+    window.addEventListener("beforeprint", before);
+    window.addEventListener("afterprint", after);
+    
+    const mq = window.matchMedia("print");
+    const onChange = (e: MediaQueryListEvent) => (e.matches ? blank() : restore());
+    mq.addEventListener?.("change", onChange);
+    
+    return () => {
+      window.removeEventListener("beforeprint", before);
+      window.removeEventListener("afterprint", after);
+      mq.removeEventListener?.("change", onChange);
+    };
+  }, []);
+  
+  return { triggerPrint: () => { blank(); setTimeout(() => { window.print(); setTimeout(restore, 800); }, 50); } };
+}
 
 // ### 便利関数
 const jpy = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 });
@@ -43,15 +70,16 @@ type State = {
   bank: Bank;
   lines: Line[];
   notes?: string;
+  receiptAmount?: number; // 領収書用直接金額入力
 };
 
 const EMPTY: State = {
   docType:'quote',
   number:'QTE-YYYYMM-001',
   issueDate: todayISO(),
-  parties:{ issuer:{ name:"あなたの事業者名", address:"住所", tel:"", regNo:"T" }, customer:{ name:"取引先名 御中", address:"" } },
-  bank:{ bank:"銀行名", branch:"支店", type:"普通", number:"1234567", holder:"名義" },
-  lines: [ { date: todayISO(), name: "作業内容", desc:"", qty:1, unit:"式", unitPrice:0, taxRate:10 } ],
+  parties:{ issuer:{ name:"", address:"", tel:"", regNo:"" }, customer:{ name:"", address:"" } },
+  bank:{ bank:"", branch:"", type:"", number:"", holder:"" },
+  lines: [ { date: todayISO(), name: "", desc:"", qty:1, unit:"式", unitPrice:0, taxRate:10 } ],
   notes: "お支払期日までのお振込をお願いいたします（振込手数料はご負担下さい）。",
 };
 
@@ -74,6 +102,7 @@ function useTotals(lines: Line[]){
 
 export default function DocumentMaker(){
   const [st, setSt] = useState<State>(EMPTY);
+  const { triggerPrint } = useHideBrowserPrintHeader();
 
   // ローカルストレージから保存データを読み込み
   useEffect(()=>{
@@ -136,17 +165,68 @@ export default function DocumentMaker(){
     alert('共有リンクをコピーしました');
   }
 
+  function updLine(i:number, p:Partial<Line>){ 
+    setSt(s=>({ ...s, lines: s.lines.map((x,idx)=> idx===i?{...x,...p}:x ) })); 
+  }
+  
+  function delLine(i:number){ 
+    setSt(s=>({ ...s, lines: s.lines.filter((_,idx)=> idx!==i ) })); 
+  }
+
+  // 郵便番号から住所を取得する関数
+  async function fetchAddressFromZipCode(zipCode: string): Promise<string | null> {
+    // ハイフンを削除して7桁の数字のみにする
+    const cleanZip = zipCode.replace(/\D/g, '');
+    if (cleanZip.length !== 7) return null;
+    
+    try {
+      const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${cleanZip}`);
+      const data = await response.json();
+      
+      if (data.status === 200 && data.results && data.results.length > 0) {
+        const result = data.results[0];
+        return `${result.address1}${result.address2}${result.address3}`;
+      }
+      return null;
+    } catch (error) {
+      console.warn('住所取得エラー:', error);
+      return null;
+    }
+  }
+
+  // 郵便番号変更時の処理（発行者用）
+  async function handleIssuerZipChange(zipCode: string) {
+    setSt({...st, parties:{...st.parties, issuer:{...st.parties.issuer, zipCode}}});
+    
+    const address = await fetchAddressFromZipCode(zipCode);
+    if (address && !st.parties.issuer.address) {
+      setSt(prev => ({...prev, parties:{...prev.parties, issuer:{...prev.parties.issuer, address}}}));
+    }
+  }
+
+  // 郵便番号変更時の処理（取引先用）
+  async function handleCustomerZipChange(zipCode: string) {
+    setSt({...st, parties:{...st.parties, customer:{...st.parties.customer, zipCode}}});
+    
+    const address = await fetchAddressFromZipCode(zipCode);
+    if (address && !st.parties.customer.address) {
+      setSt(prev => ({...prev, parties:{...prev.parties, customer:{...prev.parties.customer, address}}}));
+    }
+  }
+
   // テンプレ: 各帳票に合わせてフィールドの見え方だけ切替
   return (
     <div className="min-h-screen bg-slate-50"> 
       <div className="max-w-6xl mx-auto p-3 sm:p-6">
-        <h1 className="text-xl sm:text-2xl font-semibold mb-4 no-print text-center sm:text-left">超シンプル帳票ジェネレーター（保存なし）</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold mb-4 no-print text-center sm:text-left">かんたん帳票</h1>
 
-        {/* コントロール群 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <div>
-            <label className="block text-sm font-semibold text-blue-700 mb-1">📄 帳票タイプ</label>
-            <select className="input" value={st.docType} onChange={e=>{
+        {/* 帳票タイプ選択 - 最初に目立つように配置 */}
+        <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6 no-print">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-2xl">📄</span>
+            <label className="text-lg font-bold text-blue-800">まず帳票タイプを選択してください</label>
+          </div>
+          <select className="w-full px-4 py-3 text-lg font-semibold border-2 border-blue-400 rounded-lg bg-white hover:border-blue-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition-colors" value={st.docType} onChange={e=>{
               const newType = e.target.value as DocType;
               const prefixMap = {
                 quote: 'QTE-YYYYMM-001',
@@ -163,10 +243,22 @@ export default function DocumentMaker(){
               <option value="invoice">請求書</option>
               <option value="receipt">領収書</option>
             </select>
-          </div>
+        </div>
+
+        {/* その他のコントロール群 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 no-print">
           <div>
-            <label className="block text-sm font-semibold text-blue-700 mb-1">🔢 書類番号</label>
-            <input className="input" value={st.number} onChange={e=>setSt({...st, number:e.target.value})} />
+            <label className="block text-sm font-semibold text-blue-700 mb-1">
+              🔢 書類番号
+              <span className="ml-1 relative inline-block group">
+                <span className="cursor-help inline-flex items-center justify-center w-4 h-4 text-xs bg-gray-300 text-gray-600 rounded-full hover:bg-gray-400 hover:text-white transition-colors">?</span>
+                <span className="absolute left-0 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                  お客様独自の管理番号を自由に設定できます。<br/>
+                  例：INV-2025-001、請求書No.001など
+                </span>
+              </span>
+            </label>
+            <input className="input" placeholder="例：INV-2025-001" value={st.number} onChange={e=>setSt({...st, number:e.target.value})} />
           </div>
           <div>
             <label className="block text-sm font-semibold text-blue-700 mb-1">📅 発行日</label>
@@ -175,34 +267,55 @@ export default function DocumentMaker(){
         </div>
 
         {/* 取引先/発行者 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6 no-print">
           <fieldset className="card">
             <legend className="legend text-base font-semibold">🏢 発行者（自社）</legend>
-            <input className={`input ${st.parties.issuer.name === 'あなたの事業者名' ? 'border-red-400 bg-red-50' : ''}`} placeholder="会社名を入力" value={st.parties.issuer.name} onChange={e=>setSt({...st, parties:{...st.parties, issuer:{...st.parties.issuer, name:e.target.value}}})} />
-            {st.parties.issuer.name === 'あなたの事業者名' && <div className="text-xs text-red-500 mt-1">⚠️ 会社名を入力してください</div>}
+            <input className={`input ${!st.parties.issuer.name ? 'border-red-400 bg-red-50' : ''}`} placeholder="あなたの事業者名" value={st.parties.issuer.name} onChange={e=>setSt({...st, parties:{...st.parties, issuer:{...st.parties.issuer, name:e.target.value}}})} />
+            {!st.parties.issuer.name && <div className="text-xs text-red-500 mt-1">⚠️ 会社名を入力してください</div>}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-              <input className="input sm:col-span-1" placeholder="〒000-0000" value={st.parties.issuer.zipCode||''} onChange={e=>setSt({...st, parties:{...st.parties, issuer:{...st.parties.issuer, zipCode:e.target.value}}})} />
+              <input 
+                className="input sm:col-span-1" 
+                placeholder="〒000-0000" 
+                value={st.parties.issuer.zipCode||''} 
+                onChange={e=>handleIssuerZipChange(e.target.value)}
+                maxLength={8}
+              />
               <input className="input sm:col-span-3" placeholder="都道府県市区町村番地マンション名・部屋番号" value={st.parties.issuer.address||''} onChange={e=>setSt({...st, parties:{...st.parties, issuer:{...st.parties.issuer, address:e.target.value}}})} />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <input className="input sm:col-span-1" placeholder="電話番号" value={st.parties.issuer.tel||''} onChange={e=>setSt({...st, parties:{...st.parties, issuer:{...st.parties.issuer, tel:e.target.value}}})} />
-              <input className="input sm:col-span-2" placeholder="登録番号（Tから始まるインボイス番号）" value={st.parties.issuer.regNo||''} onChange={e=>setSt({...st, parties:{...st.parties, issuer:{...st.parties.issuer, regNo:e.target.value}}})} />
+              <div className="sm:col-span-2">
+                <div className="relative">
+                  <input className="input w-full" placeholder="登録番号（例：T1234567890123）" value={st.parties.issuer.regNo||''} onChange={e=>setSt({...st, parties:{...st.parties, issuer:{...st.parties.issuer, regNo:e.target.value}}})} />
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 inline-block group">
+                    <span className="cursor-help inline-flex items-center justify-center w-4 h-4 text-xs bg-gray-300 text-gray-600 rounded-full hover:bg-gray-400 hover:text-white transition-colors">?</span>
+                    <span className="absolute right-0 bottom-full mb-2 w-72 p-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
+                      適格請求書発行事業者の登録番号です。<br/>
+                      T + 13桁の数字で構成されます。<br/>
+                      例：T1234567890123<br/>
+                      登録がない場合は空欄でOKです。
+                    </span>
+                  </span>
+                </div>
+              </div>
             </div>
           </fieldset>
           <fieldset className="card">
             <legend className="legend text-base font-semibold">🏢 取引先</legend>
             <div className="flex gap-2">
               <input 
-                className={`input flex-1 ${st.parties.customer.name === '取引先名 御中' ? 'border-red-400 bg-red-50' : ''}`} 
-                placeholder="取引先名を入力" 
+                className={`input flex-grow ${!st.parties.customer.name ? 'border-red-400 bg-red-50' : ''}`} 
+                style={{ flexBasis: '75%' }}
+                placeholder="取引先名" 
                 value={st.parties.customer.name.replace(/ (御中|様|殿)$/, '')} 
                 onChange={e=>{
                   const suffix = st.parties.customer.name.match(/ (御中|様|殿)$/)?.[1] || '御中';
-                  setSt({...st, parties:{...st.parties, customer:{...st.parties.customer, name: e.target.value ? `${e.target.value} ${suffix}` : '取引先名 御中'}}});
+                  setSt({...st, parties:{...st.parties, customer:{...st.parties.customer, name: e.target.value ? `${e.target.value} ${suffix}` : ''}}});
                 }} 
               />
               <select 
-                className="input w-20 text-sm" 
+                className="input flex-shrink-0 text-sm"
+                style={{ width: '100px' }} 
                 value={st.parties.customer.name.match(/ (御中|様|殿)$/)?.[1] || '御中'}
                 onChange={e=>{
                   const baseName = st.parties.customer.name.replace(/ (御中|様|殿)$/, '') || '取引先名';
@@ -214,9 +327,15 @@ export default function DocumentMaker(){
                 <option value="殿">殿</option>
               </select>
             </div>
-            {st.parties.customer.name === '取引先名 御中' && <div className="text-xs text-red-500 mt-1">⚠️ 取引先名を入力してください</div>}
+            {!st.parties.customer.name && <div className="text-xs text-red-500 mt-1">⚠️ 取引先名を入力してください</div>}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-              <input className="input sm:col-span-1" placeholder="〒000-0000" value={st.parties.customer.zipCode||''} onChange={e=>setSt({...st, parties:{...st.parties, customer:{...st.parties.customer, zipCode:e.target.value}}})} />
+              <input 
+                className="input sm:col-span-1" 
+                placeholder="〒000-0000" 
+                value={st.parties.customer.zipCode||''} 
+                onChange={e=>handleCustomerZipChange(e.target.value)}
+                maxLength={8}
+              />
               <input className="input sm:col-span-3" placeholder="都道府県市区町村番地マンション名・部屋番号" value={st.parties.customer.address||''} onChange={e=>setSt({...st, parties:{...st.parties, customer:{...st.parties.customer, address:e.target.value}}})} />
             </div>
           </fieldset>
@@ -272,15 +391,51 @@ export default function DocumentMaker(){
           </div>
         )}
 
-        {/* 明細（領収書/契約書は非表示） */}
-        {(st.docType==='quote' || st.docType==='po' || st.docType==='invoice') && (
-          <div className="mb-6 no-print">
+        {/* 領収書用金額入力 */}
+        {st.docType==='receipt' && (
+          <div className="mb-4 sm:mb-6">
+            <fieldset className="card">
+              <legend className="legend">💰 領収金額</legend>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">金額（税込）</label>
+                  <input 
+                    type="number" 
+                    className="input text-right" 
+                    placeholder="0" 
+                    value={st.receiptAmount||''} 
+                    onChange={e=>setSt({...st, receiptAmount: Number(e.target.value)})} 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-blue-700 mb-1">但し書き</label>
+                  <input 
+                    className="input" 
+                    placeholder="サービス利用料として" 
+                    value={st.subject||''} 
+                    onChange={e=>setSt({...st, subject: e.target.value})} 
+                  />
+                </div>
+              </div>
+              <div className="text-xs text-slate-600 mt-2">
+                ※ 金額を入力しない場合は下の明細から自動計算されます
+              </div>
+            </fieldset>
+          </div>
+        )}
+
+        {/* 明細 - 帳票タイプに応じてスタイル切り替え */}
+        {(st.docType==='quote' || st.docType==='po' || st.docType==='invoice' || st.docType==='receipt') && (
+          <div className={`mb-6 no-print ${st.docType === 'contract' ? 'opacity-60' : ''}`}>
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold">明細</h2>
-              <button className="btn" onClick={()=>setSt({...st, lines:[...st.lines,{date:todayISO(), name:'項目', desc:'', qty:1, unit:'式', unitPrice:0, taxRate:10}]})}>行を追加</button>
+              <h2 className={`text-lg font-semibold ${st.docType === 'receipt' ? 'text-gray-500' : ''}`}>
+                明細 
+                {st.docType === 'receipt' && <span className="text-sm text-gray-500">（領収書では金額直接入力も可能）</span>}
+              </h2>
+              <button className={`${st.docType === 'receipt' ? 'btn-secondary' : 'btn'}`} onClick={()=>setSt({...st, lines:[...st.lines,{date:todayISO(), name:'', desc:'', qty:1, unit:'式', unitPrice:0, taxRate:10}]})}>行を追加</button>
             </div>
             {/* スマホ対応：カード形式の明細入力 */}
-            <div className="block sm:hidden space-y-4">
+            <div className="block md:hidden space-y-4">
               {st.lines.map((l, i)=> (
                 <div key={i} className="border rounded-xl p-4 bg-gray-50 space-y-3">
                   <div className="flex justify-between items-center">
@@ -301,26 +456,30 @@ export default function DocumentMaker(){
                       </select>
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-xs text-slate-600 mb-1">内容</label>
-                    <input className="input text-sm" value={l.name} onChange={e=>updLine(i,{name:e.target.value})} />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-600 mb-1">説明</label>
-                    <input className="input text-sm" value={l.desc||''} onChange={e=>updLine(i,{desc:e.target.value})} />
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-4">
                     <div>
-                      <label className="block text-xs text-slate-600 mb-1">数量</label>
-                      <input type="number" className="input text-right text-sm" value={l.qty} onChange={e=>updLine(i,{qty:Number(e.target.value)})} />
+                      <label className="block text-sm font-semibold text-blue-700 mb-2">📝 内容</label>
+                      <input className="input text-lg font-medium min-h-[56px] px-4 py-3" placeholder="商品名・サービス名・作業内容など" value={l.name} onChange={e=>updLine(i,{name:e.target.value})} />
                     </div>
                     <div>
-                      <label className="block text-xs text-slate-600 mb-1">単位</label>
-                      <input className="input text-sm" value={l.unit} onChange={e=>updLine(i,{unit:e.target.value})} />
+                      <label className="block text-xs text-slate-600 mb-1">説明</label>
+                      <input className="input text-base min-h-[44px] px-3 py-2" placeholder="詳細説明（任意）" value={l.desc||''} onChange={e=>updLine(i,{desc:e.target.value})} />
                     </div>
+                  </div>
+                  <div className="space-y-3">
                     <div>
-                      <label className="block text-xs text-slate-600 mb-1">単価(税抜)</label>
-                      <input type="number" className="input text-right text-sm" value={l.unitPrice} onChange={e=>updLine(i,{unitPrice:Number(e.target.value)})} />
+                      <label className="block text-sm font-bold text-blue-700 mb-2">💰 単価(税抜)</label>
+                      <input type="number" className="input text-right text-xl font-bold min-h-[56px] px-4 py-3 bg-blue-50 border-blue-200" placeholder="0" value={l.unitPrice} onChange={e=>updLine(i,{unitPrice:Number(e.target.value)})} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-slate-600 mb-1">数量</label>
+                        <input type="number" className="input text-right text-base min-h-[44px]" placeholder="1" value={l.qty} onChange={e=>updLine(i,{qty:Number(e.target.value)})} />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-600 mb-1">単位</label>
+                        <input className="input text-base min-h-[44px]" placeholder="式" value={l.unit} onChange={e=>updLine(i,{unit:e.target.value})} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -328,18 +487,18 @@ export default function DocumentMaker(){
             </div>
             
             {/* デスクトップ対応：テーブル形式 */}
-            <div className="hidden sm:block overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm border-collapse table-fixed">
                 <thead>
                   <tr className="border-y bg-slate-100">
-                    <th className="p-2 text-left">日付</th>
-                    <th className="p-2 text-left">内容</th>
-                    <th className="p-2 text-left">説明</th>
-                    <th className="p-2 text-right">数量</th>
-                    <th className="p-2 text-left">単位</th>
-                    <th className="p-2 text-right">単価(税抜)</th>
-                    <th className="p-2 text-right">税率</th>
-                    <th className="p-2"></th>
+                    <th className="p-2 text-left w-32">日付</th>
+                    <th className="p-2 text-left w-48">内容</th>
+                    <th className="p-2 text-left w-40">説明</th>
+                    <th className="p-2 text-right w-20">数量</th>
+                    <th className="p-2 text-left w-20">単位</th>
+                    <th className="p-2 text-right w-32">単価(税抜)</th>
+                    <th className="p-2 text-right w-24">税率</th>
+                    <th className="p-2 w-20"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -367,29 +526,27 @@ export default function DocumentMaker(){
           </div>
         )}
 
-        {/* 備考/振込先（見積書/請求書のみ表示） */}
-        {(st.docType==='quote' || st.docType==='invoice') && (
-          <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6">
-            <fieldset className="card w-full">
-              <legend className="legend">📝 備考</legend>
-              <textarea className="input w-full min-h-[80px] resize-none" placeholder="支払条件や注意事項など" value={st.notes||''} onChange={e=>setSt({...st, notes:e.target.value})} rows={3} />
-            </fieldset>
-            <fieldset className="card">
-              <legend className="legend">🏦 振込先</legend>
-              <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-2">
-                <input className="input" placeholder="銀行名" value={st.bank.bank||''} onChange={e=>setSt({...st, bank:{...st.bank, bank:e.target.value}})} />
-                <input className="input" placeholder="支店" value={st.bank.branch||''} onChange={e=>setSt({...st, bank:{...st.bank, branch:e.target.value}})} />
-                <input className="input" placeholder="種別（普通など）" value={st.bank.type||''} onChange={e=>setSt({...st, bank:{...st.bank, type:e.target.value}})} />
-                <input className="input" placeholder="口座番号" value={st.bank.number||''} onChange={e=>setSt({...st, bank:{...st.bank, number:e.target.value}})} />
-                <input className="input sm:col-span-full" placeholder="口座名義" value={st.bank.holder||''} onChange={e=>setSt({...st, bank:{...st.bank, holder:e.target.value}})} />
-              </div>
-            </fieldset>
-          </div>
-        )}
+        {/* 備考/振込先 - 帳票タイプに応じてスタイル切り替え */}
+        <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6 no-print">
+          <fieldset className={`w-full ${(st.docType==='quote' || st.docType==='invoice' || st.docType==='po' || st.docType==='contract') ? 'card' : 'border-2 border-gray-200 rounded-2xl p-3 sm:p-4 bg-gray-50 opacity-60 space-y-3 sm:space-y-2'}`}>
+            <legend className={`text-sm font-semibold mb-2 sm:mb-1 ${(st.docType==='quote' || st.docType==='invoice' || st.docType==='po' || st.docType==='contract') ? 'text-blue-800' : 'text-gray-500'}`}>📝 備考 {!(st.docType==='quote' || st.docType==='invoice' || st.docType==='po' || st.docType==='contract') && <span className="text-xs">（任意）</span>}</legend>
+            <textarea className={`w-full min-h-[80px] resize-none ${(st.docType==='quote' || st.docType==='invoice' || st.docType==='po' || st.docType==='contract') ? 'input' : 'w-full rounded-2xl border-2 border-gray-300 px-3 py-3 sm:py-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 text-base'}`} placeholder={st.docType === 'po' ? '納期、仕様、発注条件など' : st.docType === 'contract' ? '特記事項、追加条件など' : '支払条件や注意事項など'} value={st.notes||''} onChange={e=>setSt({...st, notes:e.target.value})} rows={3} />
+          </fieldset>
+          <fieldset className={`${(st.docType==='invoice' || st.docType==='contract') ? 'card' : 'border-2 border-gray-200 rounded-2xl p-3 sm:p-4 bg-gray-50 opacity-60 space-y-3 sm:space-y-2'}`}>
+            <legend className={`text-sm font-semibold mb-2 sm:mb-1 ${(st.docType==='invoice' || st.docType==='contract') ? 'text-blue-800' : 'text-gray-500'}`}>🏦 振込先 {!(st.docType==='invoice' || st.docType==='contract') && <span className="text-xs">（任意）</span>}</legend>
+            <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-2">
+              <input className={`${(st.docType==='invoice' || st.docType==='contract') ? 'input' : 'w-full rounded-2xl border-2 border-gray-300 px-3 py-3 sm:py-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 text-base'}`} placeholder="銀行名" value={st.bank.bank||''} onChange={e=>setSt({...st, bank:{...st.bank, bank:e.target.value}})} />
+              <input className={`${(st.docType==='invoice' || st.docType==='contract') ? 'input' : 'w-full rounded-2xl border-2 border-gray-300 px-3 py-3 sm:py-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 text-base'}`} placeholder="支店" value={st.bank.branch||''} onChange={e=>setSt({...st, bank:{...st.bank, branch:e.target.value}})} />
+              <input className={`${(st.docType==='invoice' || st.docType==='contract') ? 'input' : 'w-full rounded-2xl border-2 border-gray-300 px-3 py-3 sm:py-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 text-base'}`} placeholder="種別（普通など）" value={st.bank.type||''} onChange={e=>setSt({...st, bank:{...st.bank, type:e.target.value}})} />
+              <input className={`${(st.docType==='invoice' || st.docType==='contract') ? 'input' : 'w-full rounded-2xl border-2 border-gray-300 px-3 py-3 sm:py-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 text-base'}`} placeholder="口座番号" value={st.bank.number||''} onChange={e=>setSt({...st, bank:{...st.bank, number:e.target.value}})} />
+              <input className={`sm:col-span-full ${(st.docType==='invoice' || st.docType==='contract' || st.docType==='po') ? 'input' : 'w-full rounded-2xl border-2 border-gray-300 px-3 py-3 sm:py-2 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 text-base'}`} placeholder="口座名義" value={st.bank.holder||''} onChange={e=>setSt({...st, bank:{...st.bank, holder:e.target.value}})} />
+            </div>
+          </fieldset>
+        </div>
 
         {/* ボタン */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6 sm:mb-8">
-          <button className="btn" onClick={()=>window.print()}>
+          <button className="btn" onClick={()=>triggerPrint()}>
             <span className="hidden sm:inline">印刷 / PDF保存</span>
             <span className="sm:hidden">印刷・PDF</span>
           </button>
@@ -405,8 +562,8 @@ export default function DocumentMaker(){
         </div>
 
         {/* プレビュー */}
-        <div className="bg-white shadow-sm rounded-2xl p-4 sm:p-8 print:p-0 print:shadow-none">
-          <div className="text-center mb-4 sm:hidden">
+        <div id="print-area" className="bg-white shadow-sm rounded-2xl p-4 sm:p-8 print:p-0 print:shadow-none">
+          <div className="text-center mb-4 sm:hidden no-print">
             <h3 className="text-lg font-semibold text-slate-700">プレビュー</h3>
             <p className="text-xs text-slate-500 mt-1">実際の印刷イメージです</p>
           </div>
@@ -415,58 +572,8 @@ export default function DocumentMaker(){
           </div>
         </div>
       </div>
-
-      {/* Styles */}
-      <style jsx global>{`
-        .input{ 
-          @apply w-full rounded-2xl border-2 border-blue-300 px-3 py-3 sm:py-2 bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-500 text-base; 
-          min-height: 44px;
-          transition: all 0.2s ease-in-out;
-        }
-        .input:focus {
-          background-color: white;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        .btn{ 
-          @apply inline-flex items-center justify-center rounded-xl border border-transparent bg-sky-600 px-4 py-3 sm:py-2 text-white hover:bg-sky-700 active:bg-sky-800 text-base font-medium; 
-          min-height: 44px;
-          touch-action: manipulation;
-        }
-        .btn-secondary{ 
-          @apply inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 sm:py-2 text-slate-700 hover:bg-slate-50 text-base font-medium; 
-          min-height: 44px;
-          touch-action: manipulation;
-        }
-        .card{ @apply border-2 border-blue-200 rounded-2xl p-3 sm:p-4 bg-blue-50 space-y-3 sm:space-y-2; }
-        .legend{ @apply text-sm font-semibold mb-2 sm:mb-1 text-blue-800; }
-        .a4{ width:100%; max-width:794px; min-height:1123px; margin:0 auto; }
-        
-        /* スマホでのタッチ操作改善 */
-        select.input, textarea.input {
-          -webkit-appearance: none;
-          appearance: none;
-        }
-        
-        /* スマホでのズーム無効化（入力フィールドのフォーカス時） */
-        @media screen and (max-width: 768px) {
-          .input {
-            font-size: 16px !important;
-          }
-        }
-        
-        @page{ size: A4; margin: 14mm; }
-        @media print{ 
-          .btn,.btn-secondary,.card,.input, select, textarea, legend, label { display:none !important } 
-          .no-print { display:none !important }
-          body{ background:#fff } 
-          .a4{ width:auto; min-height:auto; } 
-        }
-      `}</style>
     </div>
   );
-
-  function updLine(i:number, p:Partial<Line>){ setSt(s=>({ ...s, lines: s.lines.map((x,idx)=> idx===i?{...x,...p}:x ) })); }
-  function delLine(i:number){ setSt(s=>({ ...s, lines: s.lines.filter((_,idx)=> idx!==i ) })); }
 }
 
 // =================== プレビュー（各帳票の紙面） ===================
@@ -512,6 +619,7 @@ function InvoiceDoc({ st, totals }:{ st:State; totals: ReturnType<typeof useTota
         <div className="text-sm text-right">
           <div>書類番号：{st.number}</div>
           <div>請求日：{fmtDate(st.issueDate)}</div>
+          {st.payerTerms && <div>お支払条件：{st.payerTerms}</div>}
           {st.dueDate && <div>お支払期日：{fmtDate(st.dueDate)}</div>}
         </div>
       </div>
@@ -727,7 +835,8 @@ function PODoc({ st }:{ st:State }){
 
 // ---------- 領収書 ----------
 function ReceiptDoc({ st, totals }:{ st:State; totals: ReturnType<typeof useTotals> }){
-  const gross = totals.grossAll;
+  // 直接入力された金額を優先、なければ明細から計算
+  const gross = st.receiptAmount && st.receiptAmount > 0 ? st.receiptAmount : totals.grossAll;
   return (
     <div>
       <div className="text-center mb-8">
@@ -744,10 +853,16 @@ function ReceiptDoc({ st, totals }:{ st:State; totals: ReturnType<typeof useTota
 
       <BlockTitle>内訳</BlockTitle>
       <div className="text-sm">
-        <div>税抜金額：{jpy.format(totals.netAll)}</div>
-        {[...totals.byRate.entries()].map(([rate, v])=> (
-          <div key={rate}>消費税（{rate}%）：{jpy.format(v.tax)}</div>
-        ))}
+        {st.receiptAmount && st.receiptAmount > 0 ? (
+          <div>上記金額には消費税が含まれております。</div>
+        ) : (
+          <>
+            <div>税抜金額：{jpy.format(totals.netAll)}</div>
+            {[...totals.byRate.entries()].map(([rate, v])=> (
+              <div key={rate}>消費税（{rate}%）：{jpy.format(v.tax)}</div>
+            ))}
+          </>
+        )}
       </div>
 
       <BlockTitle>発行元</BlockTitle>

@@ -21,7 +21,10 @@ body {
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  /* 日本語の見出し・段落の折り返しを自然に */
+  .text-balance { text-wrap: balance; }   /* 見出しのバランス改行 */
+  .text-pretty  { text-wrap: pretty;  }   /* 段落のきれいな改行 */
+  .ja-body      { line-height: 1.8; }     /* 読みやすい行間 */
+  /* 文章幅（行長）を抑える。必要に応じて md:max-w-2xl/3xl を併用 */
+  .measure      { max-width: 68ch; }
 }
