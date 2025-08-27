@@ -38,12 +38,36 @@ select.input, textarea.input {
   }
 }
 
-@page{ size: A4; margin: 12mm; }
-@media print{ 
-  /* 印刷／PDFは等倍に戻す（レイアウト崩れ防止） */
-  html { font-size: 16px !important; }
+/* === 印刷・PDF最適化 === */
+@page { 
+  size: A4; 
+  margin: 15mm 12mm; /* 上下少し広めに */
   
-  /* 印刷時は紙面(#print-area)だけ可視化し、アプリのヘッダー等は排除 */
+  /* 日本語印刷最適化 */
+  @bottom-center {
+    content: counter(page);
+    font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+    font-size: 9pt;
+    color: #666;
+  }
+}
+
+@media print { 
+  /* フォントレンダリング最適化 */
+  html { 
+    font-size: 16px !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  /* 日本語フォント強制適用 */
+  body, body * {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif !important;
+    line-height: 1.6 !important;
+    letter-spacing: 0.02em !important;
+  }
+  
+  /* 印刷時は紙面(#print-area)だけ可視化 */
   body * { visibility: hidden !important; }
   #print-area, #print-area * { visibility: visible !important; }
   
@@ -54,14 +78,81 @@ select.input, textarea.input {
     box-shadow: none !important; 
     border: none !important;
     background: white !important;
+    padding: 20mm 15mm !important; /* A4に最適なマージン */
+    overflow: visible !important;
+    page-break-inside: avoid;
+  }
+  
+  /* 見出し・テキストの印刷最適化 */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000 !important;
+    font-weight: bold !important;
+    page-break-after: avoid;
+  }
+  
+  h1 { font-size: 28px !important; margin-bottom: 8mm !important; }
+  h2 { font-size: 20px !important; margin-bottom: 6mm !important; }
+  h3 { font-size: 16px !important; margin-bottom: 4mm !important; }
+  
+  /* テーブルの印刷最適化 */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+  
+  th, td {
+    border: 1px solid #333 !important;
+    padding: 3mm 2mm !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    page-break-inside: avoid;
+  }
+  
+  th {
+    background: #f5f5f5 !important;
+    font-weight: bold !important;
+  }
+  
+  /* 改ページ制御 */
+  .page-break-before { page-break-before: always !important; }
+  .page-break-after { page-break-after: always !important; }
+  .no-page-break { page-break-inside: avoid !important; }
+  
+  /* 不要要素を完全に隠す */
+  .btn, .btn-secondary, .card, .input, select, textarea, 
+  legend, label, .no-print, button, nav, .tooltip,
+  [role="tooltip"], button[aria-label] { 
+    display: none !important; 
+  }
+  
+  /* リンクのURL表示を無効化 */
+  a[href]::after { content: "" !important; }
+  
+  /* 背景色・影を無効化 */
+  *, *::before, *::after {
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  body { 
+    background: #fff !important; 
+    margin: 0 !important;
     padding: 0 !important;
   }
   
-  /* リンク後ろのURLを出さない（Safari等） */
-  a[href]::after { content: "" !important; }
+  /* 印刷用のレイアウト調整 */
+  .a4 { 
+    width: auto !important; 
+    min-height: auto !important; 
+    margin: 0 !important;
+    max-width: none !important;
+  }
   
-  .btn,.btn-secondary,.card,.input, select, textarea, legend, label { display:none !important } 
-  .no-print { display:none !important }
-  body{ background:#fff } 
-  .a4{ width:auto; min-height:auto; margin: 0; } 
+  /* 数字の印刷最適化 */
+  .font-tabular, .text-right {
+    font-feature-settings: "tnum" !important;
+    font-variant-numeric: tabular-nums !important;
+  }
 }

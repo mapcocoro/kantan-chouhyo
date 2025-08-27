@@ -17,7 +17,11 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "ヒラギノ角ゴ ProN W3", "Meiryo", sans-serif;
+  line-height: 1.75;
+  font-feature-settings: 'palt';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @layer utilities {
@@ -25,24 +29,114 @@ body {
   .text-balance { text-wrap: balance; }   /* 見出しのバランス改行 */
   .text-pretty  { text-wrap: pretty;  }   /* 段落のきれいな改行 */
   .ja-body      { line-height: 1.8; }     /* 読みやすい行間 */
+  
+  /* 日本語タイポグラフィ最適化クラス */
+  .ja-heading {
+    line-height: 1.4;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    word-break: auto-phrase;
+  }
+  .ja-text {
+    line-height: 1.75;
+    letter-spacing: 0.025em;
+    word-break: auto-phrase;
+  }
+  .ja-small {
+    line-height: 1.6;
+    letter-spacing: 0.03em;
+  }
+  
+  /* 数字・アルファベット用（プロポーショナル数字） */
+  .font-numeric {
+    font-variant-numeric: proportional-nums;
+    font-feature-settings: "pnum";
+  }
+  .font-tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  
   /* 文章幅（行長）を抑える。必要に応じて md:max-w-2xl/3xl を併用 */
   .measure      { max-width: 68ch; }
+  
+  /* 日本語縦書き対応（将来的な拡張用） */
+  .writing-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
 }
 
-/* === 全体縮小（約 80〜85%）=== */
-html { font-size: 13px; }             /* 16px→13px ≒ 81.25% */
-
-/* 画面が狭い端末では少しだけ戻す（読みやすさ優先） */
-@media (max-width: 480px) {
-  html { font-size: 14px; }           /* ≒ 87.5% */
+/* === フォームコンポーネント === */
+input, select, textarea {
+  line-height: 1.4;
 }
 
-/* === コンパクト化クラス === */
-.form-compact { font-size: 0.875rem; }             /* text-sm */
-.form-compact .control {
-  height: 2.25rem;                                  /* h-9 */
-  padding: 0.5rem 0.75rem;                          /* py-2 px-3 */
-  line-height: 1.25rem;                             /* leading-tight */
+/* ツールチップ */
+[role="tooltip"] {
+  font-size: 0.75rem;
+  max-width: 200px;
+  background-color: rgb(0 0 0);
+  color: rgb(255 255 255);
+  padding: 0.25rem 0.5rem;
+  line-height: 1.3;
 }
-.form-compact .label { font-size: 0.8125rem; }      /* text-xs寄り */
-.form-compact .hint  { font-size: 0.75rem; opacity: .8; }
+
+/* === 印刷CSS === */
+@page {
+  size: A4;
+  margin: 25mm 20mm;
+}
+
+@media print {
+  /* フォーム部分を印刷時は非表示 */
+  .no-print,
+  nav,
+  button,
+  [role="tooltip"],
+  .grid > section:first-child {
+    display: none !important;
+  }
+  
+  /* プレビュー部分のみ表示 */
+  .grid > aside {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .grid {
+    display: block !important;
+  }
+  
+  body {
+    font-size: 14px !important;
+    line-height: 1.75 !important;
+    color: black !important;
+    background: white !important;
+  }
+  
+  /* テーブルの改ページ制御 */
+  table {
+    page-break-inside: auto !important;
+  }
+  
+  .row {
+    page-break-inside: avoid !important;
+  }
+  
+  .signature-section {
+    page-break-inside: avoid !important;
+  }
+  
+  /* ボックス影や背景を除去 */
+  * {
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  
+  .preview-root {
+    background: white !important;
+  }
+}
