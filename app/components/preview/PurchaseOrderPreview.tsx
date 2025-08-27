@@ -19,17 +19,17 @@ export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTo
   return (
     <div className="doc print-compact preview-root max-w-none bg-white text-black text-sm leading-7">
       {/* ヘッダー */}
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-extrabold tracking-wide mb-6">発注書</h1>
+      <div className="text-center mb-4">
+        <h1 className="text-2xl font-extrabold tracking-wide mb-3">発注書</h1>
         <div className="text-xs text-right text-slate-500 mb-2">
           <div>発注番号：{data?.docNo || 'PO-YYYYMM-001'}</div>
           <div>発注日：{formatYMD(data?.issueDate)}</div>
         </div>
-        <div className="border-b border-slate-300 mb-6"></div>
+        <div className="border-b border-slate-300 mb-4"></div>
       </div>
 
       {/* 宛先 */}
-      <div className="mb-6">
+      <div className="mb-4">
         <div className="text-base font-semibold">
           {data?.client?.name || '—'} 御中
         </div>
@@ -43,20 +43,20 @@ export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTo
 
       {/* 件名 */}
       {data?.subject && (
-        <div className="mb-6">
+        <div className="mb-4">
           <strong>件名：</strong>{data.subject}
         </div>
       )}
 
       {/* 発注金額 - 右上に太字表示 */}
-      <div className="text-right mb-6">
+      <div className="text-right mb-4">
         <div className="text-base font-bold">
           発注金額　¥{formatCurrency(grandTotal)}（税込）
         </div>
       </div>
 
       {/* 明細テーブル - CSS Grid */}
-      <div className="mb-8">
+      <div className="mb-6">
         {/* ヘッダー */}
         <div className="grid grid-cols-[1fr_minmax(4rem,auto)_minmax(72px,auto)_minmax(7rem,auto)_minmax(7rem,auto)] text-[12px] font-semibold text-slate-700 tracking-wide">
           <div className="px-3 py-2 border-b border-slate-300">品名・作業内容</div>
@@ -83,7 +83,7 @@ export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTo
       </div>
 
       {/* 合計（ボックス無し） */}
-      <div className="mt-4 ml-auto w-64 text-sm space-y-1 mb-8">
+      <div className="mt-4 ml-auto w-64 text-sm space-y-1 mb-6">
         <div className="flex justify-between border-t border-slate-300 pt-2"><span>小計</span><span className="tnum">¥{formatCurrency(subTotal)}</span></div>
         <div className="flex justify-between"><span>消費税</span><span className="tnum">¥{formatCurrency(taxTotal)}</span></div>
         <div className="flex justify-between text-[15px] font-bold"><span>合計（税込）</span><span className="tnum">¥{formatCurrency(grandTotal)}</span></div>
@@ -108,7 +108,7 @@ export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTo
       )}
 
       {/* 発行元 */}
-      <div className="text-right mt-8">
+      <div className="text-right mt-6">
         <div className="font-medium mb-2">発行元</div>
         <div className="text-[10px] text-slate-500">
           <div className="font-medium text-sm text-black">{data?.issuer?.name || '—'}</div>

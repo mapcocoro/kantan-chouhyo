@@ -98,10 +98,17 @@ input, select, textarea {
 /* 余白・罫線を抑えた印刷レイアウト */
 @page {
   size: A4;
-  margin: 12mm;  /* 小さめ余白で1枚に収めやすく */
+  margin: 0;  /* ブラウザ側でヘッダー・フッターを消すため余白0に */
 }
 
 @media print {
+  /* 実際のコンテンツ余白はここで設定 */
+  .preview-root {
+    padding: 15mm;
+    min-height: auto !important;
+    background: white !important;
+  }
+  
   /* 影や枠・背景を落とす */
   .doc, .doc * {
     box-shadow: none !important;
@@ -112,8 +119,8 @@ input, select, textarea {
   }
   
   .print-compact {
-    font-size: 0.95rem;
-    line-height: 1.5;  /* 1枚化に寄与 */
+    font-size: 0.9rem;
+    line-height: 1.4;  /* さらにコンパクトに */
   }
   
   /* フォーム部分を印刷時は非表示 */
@@ -138,10 +145,12 @@ input, select, textarea {
   }
   
   body {
-    font-size: 14px !important;
-    line-height: 1.5 !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
     color: black !important;
     background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   /* テーブルの改ページ制御 */

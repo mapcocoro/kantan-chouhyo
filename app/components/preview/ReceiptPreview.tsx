@@ -19,13 +19,13 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
   return (
     <div className="doc print-compact preview-root max-w-none bg-white text-black text-sm leading-7">
       {/* ヘッダー */}
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-extrabold tracking-wide mb-6">領収書</h1>
+      <div className="text-center mb-4">
+        <h1 className="text-2xl font-extrabold tracking-wide mb-3">領収書</h1>
         <div className="text-xs text-right text-slate-500 mb-2">
           <div>領収書番号：{data?.docNo || 'REC-YYYYMM-001'}</div>
           <div>領収日：{formatYMD(data?.issueDate)}</div>
         </div>
-        <div className="border-b border-slate-300 mb-6"></div>
+        <div className="border-b border-slate-300 mb-4"></div>
       </div>
 
       {/* 宛先 */}
@@ -42,8 +42,8 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
       </div>
 
       {/* 領収金額 - 中央に大きく表示（ボックス無し） */}
-      <div className="text-center mb-8">
-        <div className="text-sm mb-4">下記の通り領収いたしました</div>
+      <div className="text-center mb-6">
+        <div className="text-sm mb-2">下記の通り領収いたしました</div>
         <div className="text-xl font-bold">
           金　¥{formatCurrency(grandTotal)}　也
         </div>
@@ -103,9 +103,9 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
       )}
 
       {/* 発行者情報と印鑑欄 */}
-      <div className="flex justify-between items-end mt-8 signature-section">
+      <div className="flex justify-between items-end mt-6 signature-section">
         <div>
-          <div className="font-medium mb-2">発行元</div>
+          <div className="font-medium mb-1">発行元</div>
           <div className="text-[10px] text-slate-500">
             <div className="font-medium text-sm text-black">{data?.issuer?.name || '—'}</div>
             {data?.issuer?.zip && data?.issuer?.addr && (
