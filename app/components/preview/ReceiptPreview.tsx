@@ -17,7 +17,7 @@ const formatYMD = (dateStr?: string): string => {
 
 export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }: Props) {
   return (
-    <div className="preview-root max-w-none bg-white text-black text-sm leading-7">
+    <div className="doc print-compact preview-root max-w-none bg-white text-black text-sm leading-7">
       {/* ヘッダー */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-extrabold tracking-wide mb-6">領収書</h1>
@@ -61,26 +61,26 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
       {(data?.items || []).length > 0 && (
         <div className="mb-8">
           {/* ヘッダー */}
-          <div className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] text-slate-700 text-sm">
-            <div className="py-2 border-y border-slate-400 font-medium">内容</div>
-            <div className="py-2 border-y border-slate-400 font-medium text-center">数量</div>
-            <div className="py-2 border-y border-slate-400 font-medium text-right">金額</div>
+          <div className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] text-[12px] font-semibold text-slate-700 tracking-wide">
+            <div className="px-3 py-2 border-b border-slate-300">内容</div>
+            <div className="px-3 py-2 border-b border-slate-300 text-center">数量</div>
+            <div className="px-3 py-2 border-b border-slate-300 text-right">金額</div>
           </div>
           
           {/* 明細行 */}
           {(data?.items || []).map((item, index) => (
-            <div key={index} className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] border-b border-slate-300 text-sm row">
-              <div className="py-2 whitespace-pre-wrap break-words">{item?.name || '—'}</div>
-              <div className="py-2 text-center">{item?.qty || 1}</div>
-              <div className="py-2 text-right">¥{formatCurrency((item?.qty || 1) * (item?.unitPrice || 0))}</div>
+            <div key={index} className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] text-[14px] text-slate-800 row">
+              <div className="px-3 py-2 whitespace-pre-wrap break-words">{item?.name || '—'}</div>
+              <div className="px-3 py-2 text-center">{item?.qty || 1}</div>
+              <div className="px-3 py-2 text-right tnum">¥{formatCurrency((item?.qty || 1) * (item?.unitPrice || 0))}</div>
             </div>
           ))}
           
           {/* 合計行 */}
-          <div className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] border-b border-slate-300 text-sm font-bold">
-            <div className="py-2"></div>
-            <div className="py-2 text-center">合計</div>
-            <div className="py-2 text-right">¥{formatCurrency(grandTotal)}</div>
+          <div className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] border-t border-slate-300 text-[15px] font-bold">
+            <div className="px-3 py-2"></div>
+            <div className="px-3 py-2 text-center">合計</div>
+            <div className="px-3 py-2 text-right tnum">¥{formatCurrency(grandTotal)}</div>
           </div>
         </div>
       )}
@@ -98,7 +98,7 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
       {data?.memo && (
         <div className="mb-6">
           <div className="font-medium mb-2">備考</div>
-          <div className="whitespace-pre-wrap text-sm">{data.memo}</div>
+          <p className="prose-jp text-sm">{data.memo}</p>
         </div>
       )}
 
@@ -121,7 +121,7 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
         
         {/* 印鑑欄 */}
         <div className="text-center ml-8">
-          <div className="w-14 h-14 border border-slate-300 rounded-full flex items-center justify-center mb-2 p-2">
+          <div className="w-12 h-12 border border-slate-300 rounded-full flex items-center justify-center mb-2">
             <span className="text-[10px] text-slate-500">印</span>
           </div>
           <div className="text-xs text-slate-600">領収者印</div>

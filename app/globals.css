@@ -2,29 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
+/* === Typography & base === */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --doc-font: "Inter", "Noto Sans JP", system-ui, -apple-system, "Segoe UI",
+              "Helvetica Neue", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html { 
+  font-family: var(--doc-font); 
+  font-feature-settings: "palt" 1, "tnum" 1; 
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "ヒラギノ角ゴ ProN W3", "Meiryo", sans-serif;
+  font-family: var(--doc-font);
   line-height: 1.75;
-  font-feature-settings: 'palt';
+  letter-spacing: .01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 @layer utilities {
+  /* 日本語の備考を綺麗に改行 */
+  .prose-jp { 
+    white-space: pre-wrap; 
+    word-break: break-word; 
+  }
+
+  /* 表の数字を詰めて見やすく */
+  .tnum { 
+    font-variant-numeric: tabular-nums; 
+  }
+  
   /* 日本語の見出し・段落の折り返しを自然に */
   .text-balance { text-wrap: balance; }   /* 見出しのバランス改行 */
   .text-pretty  { text-wrap: pretty;  }   /* 段落のきれいな改行 */
@@ -83,12 +95,27 @@ input, select, textarea {
 }
 
 /* === 印刷CSS === */
+/* 余白・罫線を抑えた印刷レイアウト */
 @page {
   size: A4;
-  margin: 25mm 20mm;
+  margin: 12mm;  /* 小さめ余白で1枚に収めやすく */
 }
 
 @media print {
+  /* 影や枠・背景を落とす */
+  .doc, .doc * {
+    box-shadow: none !important;
+  }
+  
+  .print-no-borders, .print-no-borders * {
+    border-color: transparent !important;
+  }
+  
+  .print-compact {
+    font-size: 0.95rem;
+    line-height: 1.5;  /* 1枚化に寄与 */
+  }
+  
   /* フォーム部分を印刷時は非表示 */
   .no-print,
   nav,
@@ -112,7 +139,7 @@ input, select, textarea {
   
   body {
     font-size: 14px !important;
-    line-height: 1.75 !important;
+    line-height: 1.5 !important;
     color: black !important;
     background: white !important;
   }

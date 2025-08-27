@@ -17,7 +17,7 @@ const formatYMD = (dateStr?: string): string => {
 
 export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTotal }: Props) {
   return (
-    <div className="preview-root max-w-none bg-white text-black text-sm leading-7">
+    <div className="doc print-compact preview-root max-w-none bg-white text-black text-sm leading-7">
       {/* ヘッダー */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-extrabold tracking-wide mb-6">発注書</h1>
@@ -58,35 +58,35 @@ export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTo
       {/* 明細テーブル - CSS Grid */}
       <div className="mb-8">
         {/* ヘッダー */}
-        <div className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(5rem,auto)_minmax(7rem,auto)_minmax(7rem,auto)] text-slate-700 text-sm">
-          <div className="py-2 border-y border-slate-400 font-medium">品名・作業内容</div>
-          <div className="py-2 border-y border-slate-400 font-medium text-center">数量</div>
-          <div className="py-2 border-y border-slate-400 font-medium text-center">単位</div>
-          <div className="py-2 border-y border-slate-400 font-medium text-right">単価</div>
-          <div className="py-2 border-y border-slate-400 font-medium text-right">金額</div>
+        <div className="grid grid-cols-[1fr_minmax(4rem,auto)_minmax(72px,auto)_minmax(7rem,auto)_minmax(7rem,auto)] text-[12px] font-semibold text-slate-700 tracking-wide">
+          <div className="px-3 py-2 border-b border-slate-300">品名・作業内容</div>
+          <div className="px-3 py-2 border-b border-slate-300 text-center">数量</div>
+          <div className="px-3 py-2 border-b border-slate-300 text-center">単位</div>
+          <div className="px-3 py-2 border-b border-slate-300 text-right">単価</div>
+          <div className="px-3 py-2 border-b border-slate-300 text-right">金額</div>
         </div>
         
         {/* 明細行 */}
         {(data?.items || []).map((item, index) => (
-          <div key={index} className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(5rem,auto)_minmax(7rem,auto)_minmax(7rem,auto)] border-b border-slate-300 text-sm row">
-            <div className="py-2 whitespace-pre-wrap break-words">
+          <div key={index} className="grid grid-cols-[1fr_minmax(4rem,auto)_minmax(72px,auto)_minmax(7rem,auto)_minmax(7rem,auto)] text-[14px] text-slate-800 row">
+            <div className="px-3 py-2 whitespace-pre-wrap break-words">
               {item?.name || '—'}
-              {item?.desc && <div className="text-slate-600 mt-1">{item.desc}</div>}
-              {item?.date && <div className="text-slate-500 text-xs mt-1">納期: {formatYMD(item.date)}</div>}
+              {item?.desc && <div className="text-slate-600 text-[13px] mt-1">{item.desc}</div>}
+              {item?.date && <div className="text-slate-500 text-[11px] mt-1">納期: {formatYMD(item.date)}</div>}
             </div>
-            <div className="py-2 text-center">{item?.qty || 1}</div>
-            <div className="py-2 text-center">{item?.unit || '式'}</div>
-            <div className="py-2 text-right">¥{formatCurrency(item?.unitPrice || 0)}</div>
-            <div className="py-2 text-right">¥{formatCurrency((item?.qty || 1) * (item?.unitPrice || 0))}</div>
+            <div className="px-3 py-2 text-center">{item?.qty || 1}</div>
+            <div className="px-3 py-2 text-center text-[13px]">{item?.unit || '式'}</div>
+            <div className="px-3 py-2 text-right tnum">¥{formatCurrency(item?.unitPrice || 0)}</div>
+            <div className="px-3 py-2 text-right tnum">¥{formatCurrency((item?.qty || 1) * (item?.unitPrice || 0))}</div>
           </div>
         ))}
       </div>
 
       {/* 合計（ボックス無し） */}
       <div className="mt-4 ml-auto w-64 text-sm space-y-1 mb-8">
-        <div className="flex justify-between"><span>小計</span><span className="font-semibold">¥{formatCurrency(subTotal)}</span></div>
-        <div className="flex justify-between"><span>消費税</span><span className="font-semibold">¥{formatCurrency(taxTotal)}</span></div>
-        <div className="flex justify-between text-base font-bold"><span>合計（税込）</span><span>¥{formatCurrency(grandTotal)}</span></div>
+        <div className="flex justify-between border-t border-slate-300 pt-2"><span>小計</span><span className="tnum">¥{formatCurrency(subTotal)}</span></div>
+        <div className="flex justify-between"><span>消費税</span><span className="tnum">¥{formatCurrency(taxTotal)}</span></div>
+        <div className="flex justify-between text-[15px] font-bold"><span>合計（税込）</span><span className="tnum">¥{formatCurrency(grandTotal)}</span></div>
       </div>
 
       {/* 発注条件 */}
@@ -103,7 +103,7 @@ export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTo
       {data?.memo && (
         <div className="mb-6">
           <div className="font-medium mb-2">備考</div>
-          <div className="whitespace-pre-wrap text-sm">{data.memo}</div>
+          <p className="prose-jp text-sm">{data.memo}</p>
         </div>
       )}
 
