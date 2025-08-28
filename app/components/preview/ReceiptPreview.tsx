@@ -109,14 +109,6 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
         </div>
       )}
 
-      {/* 備考 */}
-      {data?.memo && (
-        <div className="mb-6">
-          <div className="font-medium mb-2">備考</div>
-          <p className="prose-jp text-sm">{data.memo}</p>
-        </div>
-      )}
-
       {/* 発行者情報と印鑑欄 */}
       <div className="mt-6 signature-section">
         <div className="font-medium mb-1">発行元</div>
@@ -142,6 +134,23 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
           </div>
         </div>
       </div>
+
+      {/* 備考 */}
+      {data?.memo?.trim() && (
+        <div className="mt-6 mb-4">
+          <div className="font-medium mb-2">備考</div>
+          <p className="prose-jp text-sm">{data.memo.trim()}</p>
+        </div>
+      )}
+
+      {/* 特約フッター */}
+      {data?.terms?.enabled && data?.terms?.text?.trim() && (
+        <div className="mt-8">
+          <p className="text-[11px] text-slate-500 leading-relaxed prose-jp" style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+            {data.terms.text.trim()}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

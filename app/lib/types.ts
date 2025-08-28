@@ -1,6 +1,7 @@
 // 基本の帳票データ型定義
+import { DocumentType } from '../constants/docs';
 
-export type DocumentType = 'estimate' | 'invoice' | 'purchaseOrder' | 'receipt' | 'outsourcingContract';
+export type { DocumentType };
 
 // 事業者情報
 export interface Issuer {
@@ -37,13 +38,10 @@ export interface Item {
   taxRate: number;
 }
 
-// 契約書専用フィールド
-export interface Contract {
-  period: string;          // 契約期間
-  reward: string;          // 報酬
-  paymentTerms: string;    // 支払条件
-  acceptance: string;      // 検収
-  confidentiality: string; // 秘密保持
+// 簡易特約フッター
+export interface Terms {
+  enabled: boolean;
+  text: string;
 }
 
 // 基本帳票データ
@@ -63,15 +61,32 @@ export interface FormData {
   items: Item[];
   memo?: string;
   
-  // 契約書専用
-  contract?: Contract;
+  // 簡易特約フッター
+  terms?: Terms;
 }
 
-// 帳票タイプのラベルマッピング
-export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
-  estimate: '見積書',
-  invoice: '請求書',
-  purchaseOrder: '発注書',
-  receipt: '領収書',
-  outsourcingContract: '業務委託契約書'
-};
+// 帳票タイプのラベルマッピング（新しい定数ファイルからインポート）
+export { DOC_LABELS as DOCUMENT_TYPE_LABELS, DOC_ORDER } from '../constants/docs';
+
+// 支払条件プリセット
+export const PAYMENT_TERMS_PRESETS = [
+  '月末締め、翌月末払い',
+  '月末締め、翌月10日払い',
+  '月末締め、翌々月末払い',
+  '検収完了後 7 日以内支払い',
+  '検収完了後 30 日以内支払い',
+  '納品後 7 日以内支払い',
+  '納品後 30 日以内支払い',
+  '前払い（着手金）〇％・残金：納品時',
+  'その他（自由入力）'
+];
+
+// 単位候補配列
+export const UNIT_OPTIONS = [
+  '式', '個', '件', '時間', '日', '月', '人時', 
+  'セット', '本', '台', '箇所', '枚', 
+  'ライセンス', '㎡', 'm', 'kg', 'GB'
+];
+
+// デフォルト特約文
+export const DEFAULT_TERMS_TEXT = `取引特約：支払は月末締め翌月末払い（必要に応じ源泉徴収可）。成果物の知的財産権は発注者に帰属（著作者人格権不行使）。秘密保持を遵守。30日前通知で中途解約可（着手済み分は精算）。賠償は直接損害に限り、上限は直近6か月の支払総額。準拠法は日本法、管轄は〔任意の地名〕地方裁判所。`;

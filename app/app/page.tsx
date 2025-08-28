@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import FormPanel from '../components/FormPanel';
 import PreviewPanel, { PreviewData } from '../components/PreviewPanel';
 import type { FormData, Item } from '../lib/types';
+import { DEFAULT_TERMS_TEXT } from '../lib/types';
 import { calculateTotals } from '../lib/calc';
 
 export default function Page() {
@@ -21,6 +22,10 @@ export default function Page() {
     items: [
       { name: '', desc: '', qty: 1, unit: '式', unitPrice: 0, taxRate: 10 },
     ],
+    terms: {
+      enabled: false,
+      text: DEFAULT_TERMS_TEXT
+    },
   });
 
   // ---- ハンドラ（差分更新のユーティリティ） ----
@@ -63,10 +68,10 @@ export default function Page() {
       </nav>
 
       {/* 本体（12カラム） */}
-      <main className="mx-auto max-w-[1200px] px-3 lg:px-4 py-3">
-        <div className="grid grid-cols-12 gap-3 lg:gap-4">
+      <main className="mx-auto max-w-[1400px] px-3 lg:px-4 py-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* フォーム側だけ compact 適用 */}
-          <section className="col-span-12 lg:col-span-7 xl:col-span-8 ui-compact">
+          <section className="ui-compact">
             <div className="section space-y-2">
               <FormPanel
                 state={state}
@@ -81,7 +86,7 @@ export default function Page() {
           </section>
 
           {/* プレビュー側は等倍のまま */}
-          <aside className="col-span-12 lg:col-span-5 xl:col-span-4 lg:sticky lg:top-20 min-w-[520px] max-w-[580px]">
+          <aside className="lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:overflow-y-auto">
             <PreviewPanel {...previewData} />
           </aside>
         </div>

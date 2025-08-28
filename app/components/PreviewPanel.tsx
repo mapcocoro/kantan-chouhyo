@@ -5,7 +5,6 @@ import EstimatePreview from './preview/EstimatePreview';
 import InvoicePreview from './preview/InvoicePreview';
 import PurchaseOrderPreview from './preview/PurchaseOrderPreview';
 import ReceiptPreview from './preview/ReceiptPreview';
-import ContractPreview from './preview/ContractPreview';
 
 export type PreviewData = {
   data: FormData;
@@ -34,8 +33,6 @@ export default function PreviewPanel({ data, subTotal, taxTotal, grandTotal }: P
         return <PurchaseOrderPreview data={data} subTotal={subTotal} taxTotal={taxTotal} grandTotal={grandTotal} />;
       case 'receipt':
         return <ReceiptPreview data={data} subTotal={subTotal} taxTotal={taxTotal} grandTotal={grandTotal} />;
-      case 'outsourcingContract':
-        return <ContractPreview data={data} subTotal={subTotal} taxTotal={taxTotal} grandTotal={grandTotal} />;
       default:
         return <EstimatePreview data={data} subTotal={subTotal} taxTotal={taxTotal} grandTotal={grandTotal} />;
     }
