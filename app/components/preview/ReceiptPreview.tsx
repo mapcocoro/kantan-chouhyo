@@ -53,7 +53,22 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
       <div className="mb-6">
         <div className="mb-2">
           <strong>但し：</strong>
-          {data?.subject ? (data.subject + 'の件') : '上記の通り'}
+          {(() => {
+            // 手動編集の場合
+            if (data?.manualPurpose && data?.receiptPurpose) {
+              return data.receiptPurpose;
+            }
+            
+            // 自動生成
+            if (data?.items && data.items.length > 1) {
+              return '下記の通り（別紙明細のとおり）';
+            } else if (data?.items && data.items.length === 1) {
+              const itemName = data.items[0]?.name || data?.subject;
+              return itemName ? `${itemName}代として` : '上記の通り';
+            }
+            
+            return data?.subject ? `${data.subject}の件` : '上記の通り';
+          })()}
         </div>
       </div>
 

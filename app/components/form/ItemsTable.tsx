@@ -79,19 +79,27 @@ export default function ItemsTable({ docType, items, onItemChange, onAddItem, on
                 </td>
                 <td className="px-2 py-1">
                   <select
-                    className={inputCls + " text-center"}
+                    className="min-w-24 w-28 text-sm leading-6 px-2 py-1 h-9 rounded border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-sky-300 focus:border-sky-300 text-center"
                     value={item.unit || '式'}
                     onChange={(e) => onItemChange(index, { unit: e.target.value })}
                   >
                     <option value="式">式</option>
-                    <option value="人日">人日</option>
-                    <option value="時間">時間</option>
                     <option value="個">個</option>
-                    <option value="枚">枚</option>
+                    <option value="件">件</option>
+                    <option value="時間">時間</option>
+                    <option value="日">日</option>
+                    <option value="月">月</option>
+                    <option value="人時">人時</option>
+                    <option value="セット">セット</option>
                     <option value="本">本</option>
                     <option value="台">台</option>
-                    <option value="セット">セット</option>
-                    <option value="その他">その他</option>
+                    <option value="箇所">箇所</option>
+                    <option value="枚">枚</option>
+                    <option value="ライセンス">ライセンス</option>
+                    <option value="㎡">㎡</option>
+                    <option value="m">m</option>
+                    <option value="kg">kg</option>
+                    <option value="GB">GB</option>
                   </select>
                 </td>
                 <td className="px-2 py-1">

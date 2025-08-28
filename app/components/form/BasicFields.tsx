@@ -8,11 +8,13 @@ interface Props {
   issueDate: string;
   dueDate?: string;
   paymentSite?: string;
+  customPaymentSite?: string;
   onDocNoChange: (value: string) => void;
   onSubjectChange: (value: string) => void;
   onIssueDateChange: (value: string) => void;
   onDueDateChange: (value: string) => void;
   onPaymentSiteChange: (value: string) => void;
+  onCustomPaymentSiteChange?: (value: string) => void;
 }
 
 const inputCls = "h-7 w-full text-xs px-2 py-1 rounded border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-sky-300 focus:border-sky-300";
@@ -24,11 +26,13 @@ export default function BasicFields({
   issueDate,
   dueDate,
   paymentSite,
+  customPaymentSite,
   onDocNoChange,
   onSubjectChange,
   onIssueDateChange,
   onDueDateChange,
-  onPaymentSiteChange
+  onPaymentSiteChange,
+  onCustomPaymentSiteChange
 }: Props) {
   const getDocNoLabel = () => {
     switch (docType) {
@@ -117,14 +121,28 @@ export default function BasicFields({
             </label>
             <select
               className={inputCls}
-              value={paymentSite || '月末締め翌月末払い'}
+              value={paymentSite || '月末締め、翌月末払い'}
               onChange={(e) => onPaymentSiteChange(e.target.value)}
             >
-              <option value="月末締め翌月末払い">月末締め翌月末払い</option>
-              <option value="納品後7日以内">納品後7日以内</option>
-              <option value="納品後30日以内">納品後30日以内</option>
-              <option value="その他">その他</option>
+              <option value="月末締め、翌月末払い">月末締め、翌月末払い</option>
+              <option value="月末締め、翌月10日払い">月末締め、翌月10日払い</option>
+              <option value="月末締め、翌々月末払い">月末締め、翌々月末払い</option>
+              <option value="検収完了後 7 日以内支払い">検収完了後 7 日以内支払い</option>
+              <option value="検収完了後 30 日以内支払い">検収完了後 30 日以内支払い</option>
+              <option value="納品後 7 日以内支払い">納品後 7 日以内支払い</option>
+              <option value="納品後 30 日以内支払い">納品後 30 日以内支払い</option>
+              <option value="前払い（着手金）50％・残金：納品時">前払い（着手金）50％・残金：納品時</option>
+              <option value="その他（自由入力）">その他（自由入力）</option>
             </select>
+            {paymentSite === 'その他（自由入力）' && (
+              <input
+                type="text"
+                className={`${inputCls} mt-2`}
+                value={customPaymentSite || ''}
+                onChange={(e) => onCustomPaymentSiteChange?.(e.target.value)}
+                placeholder="支払条件を入力してください"
+              />
+            )}
           </div>
         </div>
       )}

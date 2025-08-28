@@ -54,6 +54,9 @@ export interface FormData {
   issueDate: string;       // 発行日
   dueDate?: string;        // 支払期日
   paymentSite?: string;    // 支払条件
+  customPaymentSite?: string; // カスタム支払条件
+  receiptPurpose?: string;    // 領収書但し書き
+  manualPurpose?: boolean;    // 手動編集フラグ
   issuer: Issuer;
   client: Client;
   bank?: Bank;
