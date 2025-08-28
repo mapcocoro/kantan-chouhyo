@@ -83,15 +83,16 @@ export default function InvoicePreview({ data, subTotal, taxTotal, grandTotal }:
       </div>
 
       {/* 備考 */}
-      {(data?.memo || true) && (
-        <div className="mb-6">
-          <div className="font-medium mb-2">備考</div>
-          <p className="prose-jp text-sm">
-            {data?.memo && `${data.memo}\n\n`}
-            お支払期日までのお振込をお願いいたします（振込手数料はご負担下さい）。
-          </p>
-        </div>
-      )}
+      <div className="mb-6">
+        <div className="font-medium mb-2">備考</div>
+        <p className="prose-jp text-sm">
+          {data?.memo ? (
+            data.memo
+          ) : (
+            'お支払期日までのお振込をお願いいたします（振込手数料はご負担下さい）。'
+          )}
+        </p>
+      </div>
 
       {/* 発行元・振込先 */}
       <div className="grid grid-cols-2 gap-8 mt-6">
