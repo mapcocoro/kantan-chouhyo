@@ -27,10 +27,10 @@ export default function ItemsTable({ docType, items, onItemChange, onAddItem, on
                   {docType === 'outsourcingContract' ? '作業日' : '納期'}
                 </th>
               )}
-              <th className="px-2 py-1 text-left border-b border-slate-300">品名・作業内容</th>
+              <th className="px-2 py-1 text-left border-b border-slate-300 w-48">品名・作業内容</th>
               <th className="px-2 py-1 text-left border-b border-slate-300">摘要</th>
               <th className="px-2 py-1 text-center border-b border-slate-300 w-16">数量</th>
-              <th className="px-2 py-1 text-center border-b border-slate-300 w-12">単位</th>
+              <th className="px-2 py-1 text-center border-b border-slate-300 w-20">単位</th>
               <th className="px-2 py-1 text-right border-b border-slate-300 w-20">単価</th>
               <th className="px-2 py-1 text-center border-b border-slate-300 w-16">税率</th>
               <th className="px-2 py-1 text-right border-b border-slate-300 w-20">金額</th>
@@ -79,7 +79,7 @@ export default function ItemsTable({ docType, items, onItemChange, onAddItem, on
                 </td>
                 <td className="px-2 py-1">
                   <select
-                    className="min-w-24 w-28 text-sm leading-6 px-2 py-1 h-9 rounded border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-sky-300 focus:border-sky-300 text-center"
+                    className="w-18 text-sm leading-6 px-2 py-1 h-9 rounded border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-sky-300 focus:border-sky-300 text-center"
                     value={item.unit || '式'}
                     onChange={(e) => onItemChange(index, { unit: e.target.value })}
                   >
