@@ -32,8 +32,8 @@ export default function ItemsTable({ docType, items, onItemChange, onAddItem, on
               <th className="px-2 py-1 text-center border-b border-slate-300 w-16">数量</th>
               <th className="px-2 py-1 text-center border-b border-slate-300 w-16">単位</th>
               <th className="px-2 py-1 text-right border-b border-slate-300 w-20">単価</th>
-              <th className="px-2 py-1 text-center border-b border-slate-300 w-16">税率</th>
-              <th className="px-2 py-1 text-right border-b border-slate-300 w-20">金額</th>
+              <th className="px-2 py-1 text-center border-b border-slate-300 w-20">税率</th>
+              <th className="px-2 py-1 text-right border-b border-slate-300 w-24">金額</th>
               <th className="px-2 py-1 text-center border-b border-slate-300 w-12"></th>
             </tr>
           </thead>
@@ -113,13 +113,13 @@ export default function ItemsTable({ docType, items, onItemChange, onAddItem, on
                 </td>
                 <td className="px-2 py-1">
                   <select
-                    className={inputCls + " text-center"}
-                    value={item.taxRate || 10}
+                    className="w-20 text-sm leading-6 px-2 py-1 h-9 rounded border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-sky-300 focus:border-sky-300 text-center"
+                    value={item.taxRate ?? 10}
                     onChange={(e) => onItemChange(index, { taxRate: Number(e.target.value) })}
                   >
-                    <option value={0}>0%</option>
-                    <option value={8}>8%</option>
-                    <option value={10}>10%</option>
+                    <option value="0">0%</option>
+                    <option value="8">8%</option>
+                    <option value="10">10%</option>
                   </select>
                 </td>
                 <td className="px-2 py-1 text-right text-slate-700 font-medium">
