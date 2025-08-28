@@ -42,7 +42,7 @@ export default function ContractPreview({ data, subTotal, taxTotal, grandTotal }
             {data?.client?.name || '＿＿＿＿＿＿＿＿＿＿'}
             {data?.client?.zip && data?.client?.addr && (
               <span className="text-xs ml-3">
-                〒{formatZip(data.client.zip)} {data.client.addr}
+                {formatZip(data.client.zip)} {data.client.addr}
               </span>
             )}
           </div>
@@ -54,7 +54,7 @@ export default function ContractPreview({ data, subTotal, taxTotal, grandTotal }
             {data?.issuer?.name || '＿＿＿＿＿＿＿＿＿＿'}
             {data?.issuer?.zip && data?.issuer?.addr && (
               <span className="text-xs ml-3">
-                〒{formatZip(data.issuer.zip)} {data.issuer.addr}
+                {formatZip(data.issuer.zip)} {data.issuer.addr}
               </span>
             )}
           </div>
@@ -146,14 +146,18 @@ export default function ContractPreview({ data, subTotal, taxTotal, grandTotal }
       <div className="grid grid-cols-2 gap-16 mt-10 signature-section">
         <div>
           <div className="mb-4 text-sm">甲（委託者）</div>
-          <div className="border-b border-slate-300 h-8 mb-6"></div>
-          <div className="w-12 h-12 rounded-full border border-slate-300 grid place-items-center text-[10px] text-slate-500">印</div>
+          <div className="flex items-end justify-between">
+            <div className="border-b border-slate-300 h-8 flex-1 mr-4"></div>
+            <div className="w-10 h-10 rounded-full border border-slate-300 grid place-items-center text-[9px] text-slate-500 flex-shrink-0">印</div>
+          </div>
         </div>
         
         <div>
           <div className="mb-4 text-sm">乙（受託者）</div>
-          <div className="border-b border-slate-300 h-8 mb-6"></div>
-          <div className="w-12 h-12 rounded-full border border-slate-300 grid place-items-center text-[10px] text-slate-500">印</div>
+          <div className="flex items-end justify-between">
+            <div className="border-b border-slate-300 h-8 flex-1 mr-4"></div>
+            <div className="w-10 h-10 rounded-full border border-slate-300 grid place-items-center text-[9px] text-slate-500 flex-shrink-0">印</div>
+          </div>
         </div>
       </div>
     </div>

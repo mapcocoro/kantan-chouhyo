@@ -118,9 +118,9 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
       )}
 
       {/* 発行者情報と印鑑欄 */}
-      <div className="flex justify-between items-end mt-6 signature-section">
-        <div>
-          <div className="font-medium mb-1">発行元</div>
+      <div className="mt-6 signature-section">
+        <div className="font-medium mb-1">発行元</div>
+        <div className="flex items-start justify-between">
           <div className="text-[10px] text-slate-500">
             <div className="font-medium text-sm text-black">{data?.issuer?.name || '—'}</div>
             {data?.issuer?.zip && data?.issuer?.addr && (
@@ -132,14 +132,14 @@ export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }:
             {data?.issuer?.tel && <div className="mt-1">TEL: {data.issuer.tel}</div>}
             {data?.issuer?.regNo && <div className="mt-1">登録番号: {data.issuer.regNo}</div>}
           </div>
-        </div>
-        
-        {/* 印鑑欄 */}
-        <div className="text-center ml-8">
-          <div className="w-12 h-12 border border-slate-300 rounded-full flex items-center justify-center mb-2">
-            <span className="text-[10px] text-slate-500">印</span>
+          
+          {/* 印鑑欄 */}
+          <div className="ml-8 text-center">
+            <div className="w-10 h-10 border border-slate-300 rounded-full flex items-center justify-center">
+              <span className="text-[9px] text-slate-500">印</span>
+            </div>
+            <div className="text-[10px] text-slate-500 mt-1">領収者印</div>
           </div>
-          <div className="text-xs text-slate-600">領収者印</div>
         </div>
       </div>
     </div>
