@@ -123,8 +123,10 @@ input, select, textarea {
     line-height: 1.4;  /* さらにコンパクトに */
   }
   
-  /* フォーム部分を印刷時は非表示 */
+  /* フォーム部分とヘッダー・フッターを印刷時は非表示 */
   .no-print,
+  header,
+  footer,
   nav,
   button,
   [role="tooltip"],
