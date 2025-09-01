@@ -1,36 +1,186 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# かんたん帳票
 
-## Getting Started
+ブラウザだけで見積書・発注書・請求書・領収書を作成できるWebアプリケーション。  
+データ保存なし、URL共有対応、PDF出力可能。
 
-First, run the development server:
+🔗 **本番環境**: https://chouhyo.cocoroai.co.jp/
+
+## 🎯 特徴
+
+- **保存不要**: データはURLハッシュにエンコード、サーバー保存なし
+- **4種類の帳票**: 見積書 → 発注書 → 請求書 → 領収書の業務フローに対応
+- **インボイス対応**: 適格請求書発行事業者登録番号、税率別集計に対応
+- **URL共有**: 入力内容をURLで共有可能
+- **印刷/PDF**: ブラウザの印刷機能でPDF保存
+
+## 🛠 技術スタック
+
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Deployment**: Vercel
+- **Icons**: Lucide React
+
+## 📦 セットアップ
 
 ```bash
+# 依存関係のインストール
+npm install
+
+# 開発サーバー起動
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# http://localhost:3000 でアクセス
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📝 npm scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| コマンド | 説明 |
+|---------|------|
+| `npm run dev` | 開発サーバー起動 (localhost:3000) |
+| `npm run build` | 本番ビルド |
+| `npm run start` | 本番サーバー起動 |
+| `npm run lint` | ESLintチェック |
+| `npm run gen:favicon` | favicon.ico生成 & バージョン自動更新 |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 プロジェクト構成
 
-## Learn More
+```
+kantan-chouhyo/
+├── app/                    # Next.js App Router
+│   ├── app/               # メインアプリケーション画面
+│   │   └── page.tsx       # 帳票作成メイン画面
+│   ├── components/        # 再利用可能なコンポーネント
+│   │   ├── form/         # 入力フォーム関連
+│   │   │   ├── BasicFields.tsx          # 基本情報入力
+│   │   │   ├── IssuerFields.tsx         # 発行者情報
+│   │   │   ├── ClientFields.tsx         # 取引先情報
+│   │   │   ├── ItemsTable.tsx           # 明細テーブル
+│   │   │   ├── BankFields.tsx           # 振込先情報
+│   │   │   ├── TermsFields.tsx          # 取引条件
+│   │   │   └── PurchaseOrderTermsFields.tsx # 発注書専用条件
+│   │   ├── preview/      # プレビュー画面
+│   │   │   ├── EstimatePreview.tsx      # 見積書
+│   │   │   ├── InvoicePreview.tsx       # 請求書
+│   │   │   ├── PurchaseOrderPreview.tsx # 発注書
+│   │   │   └── ReceiptPreview.tsx       # 領収書
+│   │   └── ui/           # UIコンポーネント
+│   ├── lib/              # ユーティリティ関数
+│   │   ├── types.ts      # TypeScript型定義
+│   │   ├── calc.ts       # 計算ロジック
+│   │   └── format.ts     # フォーマット関数
+│   ├── constants/        # 定数定義
+│   ├── layout.tsx        # ルートレイアウト
+│   └── globals.css       # グローバルCSS（印刷用含む）
+├── public/               # 静的ファイル
+│   ├── favicon.ico       # ファビコン（32×32）
+│   ├── icon.png          # アイコン元画像（512×512）
+│   └── apple-icon.png    # Apple Touch Icon
+└── scripts/              # ビルドスクリプト
+    └── gen-favicon.mjs   # favicon生成スクリプト
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 デプロイ
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Vercel自動デプロイ
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `main`ブランチへのpush/mergeで自動デプロイ
+- PRごとにプレビュー環境が作成される
 
-## Deploy on Vercel
+### 手動デプロイ
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# ビルド
+npm run build
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 静的エクスポート（必要な場合）
+npm run build && npm run export
+```
+
+## 🔧 開発ガイド
+
+### ブランチ戦略
+
+- `main`: 本番環境
+- `release/*`: リリース準備
+- `feature/*`: 新機能開発
+- `fix/*`: バグ修正
+- `chore/*`: その他メンテナンス
+
+### コーディング規約
+
+- ESLint/TypeScriptの厳格モード有効
+- 未使用変数・import禁止
+- `any`型の使用禁止
+- コンポーネントは関数コンポーネントで統一
+
+### favicon更新
+
+アイコンを更新する場合：
+
+1. `public/icon.png`を新しい画像に置き換え（512×512推奨）
+2. `npm run gen:favicon`を実行
+3. 自動的に`favicon.ico`生成＆バージョン更新
+
+## ⚠️ 注意事項
+
+### データ保存について
+- **サーバー保存なし**: 全データはURLハッシュにエンコード
+- **機密情報注意**: URLに全情報が含まれるため、共有時は注意
+- **URL長制限**: 大量の明細行がある場合、URL長制限に注意
+
+### 印刷/PDF出力
+- A4サイズ最適化済み
+- Chrome/Edge推奨（印刷プレビューが正確）
+- 印刷時は自動的にナビゲーション等が非表示
+
+### ブラウザ対応
+- モダンブラウザ推奨（Chrome, Edge, Firefox, Safari最新版）
+- IE11非対応
+
+### 発注書の特殊機能
+- 納期条件（明細ごと/日付指定/期間指定）
+- 検収条件（7日/10日/30日/検収なし/マイルストーン）
+- 支払条件（月末締め翌月末/納品後○日/前払い等）
+
+## 🐛 トラブルシューティング
+
+### ビルドエラー
+
+```bash
+# 依存関係をクリーンインストール
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### favicon表示されない
+
+```bash
+# faviconを再生成
+npm run gen:favicon
+
+# ブラウザキャッシュクリア
+# Chrome: Cmd+Shift+R (Mac) / Ctrl+F5 (Windows)
+```
+
+### 印刷レイアウト崩れ
+
+- ブラウザの印刷設定で「背景のグラフィック」を有効化
+- 余白設定を「デフォルト」または「なし」に
+- 用紙サイズをA4に設定
+
+## 📄 ライセンス
+
+© 2024 ココロAI合同会社
+
+## 👥 コントリビューター
+
+- 開発・運営: ココロAI合同会社
+- お問い合わせ: hello@cocoroai.co.jp
+
+---
+
+**開発時の参考リンク**
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Vercel Dashboard](https://vercel.com/dashboard)
