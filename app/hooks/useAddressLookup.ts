@@ -50,7 +50,7 @@ export function useAddressLookup() {
       };
 
       return addressResult;
-    } catch (err) {
+    } catch {
       setError('住所の取得に失敗しました');
       return null;
     } finally {

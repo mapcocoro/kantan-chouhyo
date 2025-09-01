@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React from "react";
 import './styles.css';
 
 // Minimal working structure

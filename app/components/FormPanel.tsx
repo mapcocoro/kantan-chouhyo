@@ -27,7 +27,7 @@ export default function FormPanel({
   onRemoveItem,
 }: Props) {
   const onChangeBank = (patch: Partial<FormData['bank']>) => {
-    onChange({ bank: { ...state.bank, ...patch } });
+    onChange({ bank: { ...state.bank, ...patch } as FormData['bank'] });
   };
 
   const onChangeTerms = (terms: NonNullable<FormData['terms']>) => {

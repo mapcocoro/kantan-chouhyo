@@ -116,7 +116,7 @@ export default function Tooltip({ content, children, side = "top" }: TooltipProp
                 top: `${coords.top}px`,
                 left: `${coords.left}px`,
                 // 矢印のX位置を CSS 変数で渡す
-                ["--arrow-x" as any]: `${coords.arrowX}px`,
+                ["--arrow-x" as string]: `${coords.arrowX}px`,
               } as React.CSSProperties)
             : undefined
         }
