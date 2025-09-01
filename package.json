@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "vercel-build": "next build --no-lint",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "gen:favicon": "node scripts/gen-favicon.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.541.0",

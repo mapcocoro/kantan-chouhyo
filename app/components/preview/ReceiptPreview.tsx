@@ -1,5 +1,5 @@
 import type { FormData } from '../../lib/types';
-import { formatDate, formatZip, safeString, safeNumber } from '../../lib/format';
+import { formatZip } from '../../lib/format';
 import { formatCurrency } from '../../lib/calc';
 
 interface Props {
@@ -15,7 +15,7 @@ const formatYMD = (dateStr?: string): string => {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 };
 
-export default function ReceiptPreview({ data, subTotal, taxTotal, grandTotal }: Props) {
+export default function ReceiptPreview({ data, grandTotal }: Props) {
   return (
     <div className="doc print-compact preview-root max-w-none bg-white text-black text-sm leading-7">
       {/* ヘッダー */}

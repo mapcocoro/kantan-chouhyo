@@ -1,7 +1,6 @@
 import Tooltip from '../ui/Tooltip';
 import type { DocumentType } from '../../lib/types';
 import { PAYMENT_TERMS_PRESETS } from '../../lib/types';
-import { DOC_LABELS } from '../../constants/docs';
 
 interface Props {
   docType: DocumentType;

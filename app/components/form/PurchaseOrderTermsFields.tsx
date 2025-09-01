@@ -64,7 +64,7 @@ export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, 
   // 納期の更新
   const handleDeliveryChange = (type: string) => {
     const newTerms = { ...terms };
-    newTerms.delivery = { type: type as any };
+    newTerms.delivery = { type: type as 'perLine' | 'date' | 'period' | 'other' };
     
     if (type === 'date') {
       newTerms.delivery.date = new Date().toISOString().split('T')[0];

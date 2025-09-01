@@ -1,5 +1,5 @@
 import type { FormData } from '../../lib/types';
-import { formatDate, formatZip, safeString, safeNumber } from '../../lib/format';
+import { formatZip } from '../../lib/format';
 import { formatCurrency } from '../../lib/calc';
 
 interface Props {

@@ -1,5 +1,5 @@
 import type { Item, DocumentType } from '../../lib/types';
-import { formatCurrency, formatPercent } from '../../lib/calc';
+import { formatCurrency } from '../../lib/calc';
 import { UNIT_OPTIONS } from '../../lib/types';
 
 interface Props {

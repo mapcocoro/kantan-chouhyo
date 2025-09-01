@@ -23,12 +23,12 @@ export function formatZip(zip: string): string {
   return zip.startsWith('〒') ? zip : `〒${zip}`;
 }
 
-export function safeString(value: any): string {
+export function safeString(value: unknown): string {
   if (value === null || value === undefined) return '';
   return String(value);
 }
 
-export function safeNumber(value: any): number {
+export function safeNumber(value: unknown): number {
   if (value === null || value === undefined || isNaN(Number(value))) return 0;
   return Number(value);
 }
