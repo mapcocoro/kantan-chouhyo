@@ -24,14 +24,13 @@ export default function IssuerFields({ docType, issuer, onChange }: Props) {
   };
 
   const getTitle = () => {
-    switch (docType) {
-      case 'estimate': return '発行者（自社）';
-      case 'invoice': return '請求者（自社）';
-      case 'purchaseOrder': return '発注者（自社）';
-      case 'receipt': return '領収者（自社）';
-      case 'outsourcingContract': return '委託者（自社）';
-      default: return '発行者（自社）';
-    }
+    const titleMap: Record<DocumentType, string> = {
+      estimate: '発行者（自社）',
+      invoice: '請求者（自社）',
+      purchaseOrder: '発注者（自社）',
+      receipt: '領収者（自社）'
+    };
+    return titleMap[docType] || '発行者（自社）';
   };
 
   return (

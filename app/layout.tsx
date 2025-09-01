@@ -83,7 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja">
       <body className="min-h-screen bg-slate-50 text-slate-900">
-        <header className="border-b bg-white">
+        <header className="border-b bg-white no-print">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
             <a href="/" className="font-semibold inline-flex items-center gap-2">
               <img 
@@ -107,7 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
         <main>{children}</main>
-        <footer className="mt-16 border-t bg-white">
+        <footer className="mt-16 border-t bg-white no-print">
           <div className="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-600 grid md:grid-cols-2 gap-4">
             <div>© {new Date().getFullYear()} ココロＡＩ合同会社</div>
             <div className="md:text-right space-x-4">

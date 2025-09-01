@@ -23,14 +23,13 @@ export default function ClientFields({ docType, client, onChange }: Props) {
   };
 
   const getTitle = () => {
-    switch (docType) {
-      case 'estimate': return '見積先';
-      case 'invoice': return '請求先';
-      case 'purchaseOrder': return '発注先';
-      case 'receipt': return '支払者';
-      case 'outsourcingContract': return '受託者';
-      default: return '取引先';
-    }
+    const titleMap: Record<DocumentType, string> = {
+      estimate: '見積先',
+      invoice: '請求先',
+      purchaseOrder: '発注先',
+      receipt: '支払者'
+    };
+    return titleMap[docType] || '取引先';
   };
 
   return (

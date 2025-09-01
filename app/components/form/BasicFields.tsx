@@ -1,5 +1,7 @@
 import Tooltip from '../ui/Tooltip';
 import type { DocumentType } from '../../lib/types';
+import { PAYMENT_TERMS_PRESETS } from '../../lib/types';
+import { DOC_LABELS } from '../../constants/docs';
 
 interface Props {
   docType: DocumentType;
@@ -8,11 +10,17 @@ interface Props {
   issueDate: string;
   dueDate?: string;
   paymentSite?: string;
+  customPaymentSite?: string;
+  receiptPurpose?: string;
+  manualPurpose?: boolean;
   onDocNoChange: (value: string) => void;
   onSubjectChange: (value: string) => void;
   onIssueDateChange: (value: string) => void;
   onDueDateChange: (value: string) => void;
   onPaymentSiteChange: (value: string) => void;
+  onCustomPaymentSiteChange?: (value: string) => void;
+  onReceiptPurposeChange?: (value: string) => void;
+  onManualPurposeChange?: (value: boolean) => void;
 }
 
 const inputCls = "h-7 w-full text-xs px-2 py-1 rounded border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-sky-300 focus:border-sky-300";
@@ -24,32 +32,36 @@ export default function BasicFields({
   issueDate,
   dueDate,
   paymentSite,
+  customPaymentSite,
+  receiptPurpose,
+  manualPurpose,
   onDocNoChange,
   onSubjectChange,
   onIssueDateChange,
   onDueDateChange,
-  onPaymentSiteChange
+  onPaymentSiteChange,
+  onCustomPaymentSiteChange,
+  onReceiptPurposeChange,
+  onManualPurposeChange
 }: Props) {
   const getDocNoLabel = () => {
-    switch (docType) {
-      case 'estimate': return '見積番号';
-      case 'invoice': return '請求書番号';
-      case 'purchaseOrder': return '発注番号';
-      case 'receipt': return '領収書番号';
-      case 'outsourcingContract': return '契約番号';
-      default: return '書類番号';
-    }
+    const labelMap: Record<DocumentType, string> = {
+      estimate: '見積番号',
+      invoice: '請求書番号',
+      purchaseOrder: '発注番号',
+      receipt: '領収書番号'
+    };
+    return labelMap[docType] || '書類番号';
   };
 
   const getIssueDateLabel = () => {
-    switch (docType) {
-      case 'estimate': return '見積日';
-      case 'invoice': return '請求日';
-      case 'purchaseOrder': return '発注日';
-      case 'receipt': return '領収日';
-      case 'outsourcingContract': return '契約日';
-      default: return '発行日';
-    }
+    const labelMap: Record<DocumentType, string> = {
+      estimate: '見積日',
+      invoice: '請求日', 
+      purchaseOrder: '発注日',
+      receipt: '領収日'
+    };
+    return labelMap[docType] || '発行日';
   };
 
   return (
@@ -67,7 +79,7 @@ export default function BasicFields({
             className={inputCls}
             value={docNo}
             onChange={(e) => onDocNoChange(e.target.value)}
-            placeholder={docType === 'outsourcingContract' ? 'CTR-YYYYMM-001' : 'INV-YYYYMM-001'}
+            placeholder="INV-YYYYMM-001"
           />
         </div>
 
@@ -117,15 +129,54 @@ export default function BasicFields({
             </label>
             <select
               className={inputCls}
-              value={paymentSite || '月末締め翌月末払い'}
+              value={paymentSite || PAYMENT_TERMS_PRESETS[0]}
               onChange={(e) => onPaymentSiteChange(e.target.value)}
             >
-              <option value="月末締め翌月末払い">月末締め翌月末払い</option>
-              <option value="納品後7日以内">納品後7日以内</option>
-              <option value="納品後30日以内">納品後30日以内</option>
-              <option value="その他">その他</option>
+              {PAYMENT_TERMS_PRESETS.map((preset) => (
+                <option key={preset} value={preset}>{preset}</option>
+              ))}
             </select>
+            {paymentSite === 'その他（自由入力）' && (
+              <input
+                type="text"
+                className={`${inputCls} mt-2`}
+                value={customPaymentSite || ''}
+                onChange={(e) => onCustomPaymentSiteChange?.(e.target.value)}
+                placeholder="支払条件を入力してください"
+              />
+            )}
           </div>
+        </div>
+      )}
+
+      {docType === 'receipt' && (
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-xs font-medium text-slate-600">
+            <input
+              type="checkbox"
+              checked={manualPurpose || false}
+              onChange={(e) => onManualPurposeChange?.(e.target.checked)}
+              className="rounded border-slate-300 text-sky-600 focus:ring-sky-300"
+            />
+            手動で但し書きを編集する
+          </label>
+          {manualPurpose && (
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-slate-600">
+                但し書き
+              </label>
+              <input
+                type="text"
+                className={inputCls}
+                value={receiptPurpose || ''}
+                onChange={(e) => onReceiptPurposeChange?.(e.target.value)}
+                placeholder="◯◯代として"
+              />
+              <p className="text-xs text-slate-500">
+                ※チェックを外すと、明細から自動生成されます
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

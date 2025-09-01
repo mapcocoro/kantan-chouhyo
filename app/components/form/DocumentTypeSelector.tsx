@@ -1,5 +1,5 @@
 import type { DocumentType } from '../../lib/types';
-import { DOCUMENT_TYPE_LABELS } from '../../lib/types';
+import { DOC_ORDER, DOC_LABELS } from '../../constants/docs';
 
 interface Props {
   value: DocumentType;
@@ -17,9 +17,9 @@ export default function DocumentTypeSelector({ value, onChange }: Props) {
         value={value}
         onChange={(e) => onChange(e.target.value as DocumentType)}
       >
-        {Object.entries(DOCUMENT_TYPE_LABELS).map(([key, label]) => (
-          <option key={key} value={key}>
-            {label}
+        {DOC_ORDER.map(docType => (
+          <option key={docType} value={docType}>
+            {DOC_LABELS[docType]}
           </option>
         ))}
       </select>

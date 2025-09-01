@@ -2,29 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* === Typography & base === */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --doc-font: "Inter", "Noto Sans JP", system-ui, -apple-system, "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html { 
+  font-family: var(--doc-font); 
+  font-feature-settings: "palt" 1, "tnum" 1; 
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "ヒラギノ角ゴ ProN W3", "Meiryo", sans-serif;
+  font-family: var(--doc-font);
   line-height: 1.75;
-  font-feature-settings: 'palt';
+  letter-spacing: .01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 @layer utilities {
+  /* 日本語の備考を綺麗に改行 */
+  .prose-jp { 
+    white-space: pre-wrap; 
+    word-break: break-word; 
+  }
+
+  /* 表の数字を詰めて見やすく */
+  .tnum { 
+    font-variant-numeric: tabular-nums; 
+  }
+  
   /* 日本語の見出し・段落の折り返しを自然に */
   .text-balance { text-wrap: balance; }   /* 見出しのバランス改行 */
   .text-pretty  { text-wrap: pretty;  }   /* 段落のきれいな改行 */
@@ -83,43 +94,119 @@ input, select, textarea {
 }
 
 /* === 印刷CSS === */
+/* 余白・罫線を抑えた印刷レイアウト */
 @page {
   size: A4;
-  margin: 25mm 20mm;
+  margin: 12mm;
 }
 
 @media print {
-  /* フォーム部分を印刷時は非表示 */
+  /* 実際のコンテンツ余白はここで設定 */
+  .preview-root {
+    padding: 0;
+    min-height: auto !important;
+    background: white !important;
+    font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "ヒラギノ角ゴ ProN W3", "Meiryo", sans-serif;
+  }
+  
+  /* 影や枠・背景を落とす */
+  .doc, .doc * {
+    box-shadow: none !important;
+  }
+  
+  .print-no-borders, .print-no-borders * {
+    border-color: transparent !important;
+  }
+  
+  .print-compact {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  /* CSS Grid borders - keep only essential borders */
+  .border-y, .border-b, .border-t {
+    border-width: 0.5px !important;
+    border-color: #475569 !important;
+  }
+  
+  /* Remove outer borders completely */
+  .border, .border-slate-300, .border-slate-400 {
+    border: none !important;
+  }
+  
+  /* Keep only header bottom borders for grid layouts */
+  .grid > div:first-child {
+    border-bottom: 0.5px solid #475569 !important;
+  }
+  
+  /* 改ページ制御 */
+  .break-inside-avoid {
+    break-inside: avoid;
+  }
+  
+  /* 明細テーブルの改ページ禁止 */
+  .items-table {
+    break-inside: avoid;
+  }
+  
+  /* 合計ブロックの改ページ禁止 */
+  .totals-block {
+    break-inside: avoid;
+  }
+  
+  /* 改ページ禁止ユーティリティ */
+  .no-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  
+  /* Grid layouts should print properly */
+  .grid {
+    display: grid !important;
+  }
+  
+  /* リンクの下線を無効化 */
+  a {
+    text-decoration: none !important;
+  }
+  
+  /* フォーム部分とヘッダー・フッターを印刷時は非表示 */
   .no-print,
+  header,
+  footer,
   nav,
   button,
-  [role="tooltip"],
-  .grid > section:first-child {
+  [role="tooltip"] {
+    display: none !important;
+  }
+  
+  /* Main grid should hide form section */
+  main > .grid > section:first-child {
     display: none !important;
   }
   
   /* プレビュー部分のみ表示 */
-  .grid > aside {
+  main > .grid > aside {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
     padding: 0 !important;
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
   }
   
-  .grid {
+  main > .grid {
     display: block !important;
   }
   
   body {
-    font-size: 14px !important;
-    line-height: 1.75 !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
     color: black !important;
     background: white !important;
-  }
-  
-  /* テーブルの改ページ制御 */
-  table {
-    page-break-inside: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   .row {
@@ -133,10 +220,21 @@ input, select, textarea {
   /* ボックス影や背景を除去 */
   * {
     box-shadow: none !important;
+  }
+  
+  /* Keep white background only for document root */
+  .preview-root {
+    background: white !important;
+  }
+  
+  /* Everything else should be transparent */
+  *:not(.preview-root) {
     background: transparent !important;
   }
   
-  .preview-root {
-    background: white !important;
+  /* Ensure proper Japanese typography in print */
+  .doc {
+    font-feature-settings: 'palt' 1;
+    font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", "Hiragino Sans", "ヒラギノ角ゴ ProN W3", "Meiryo", sans-serif;
   }
 }

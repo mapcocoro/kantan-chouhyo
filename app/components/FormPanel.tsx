@@ -5,7 +5,7 @@ import IssuerFields from './form/IssuerFields';
 import ClientFields from './form/ClientFields';
 import ItemsTable from './form/ItemsTable';
 import BankFields from './form/BankFields';
-import ContractFields from './form/ContractFields';
+import TermsFields from './form/TermsFields';
 
 interface Props {
   state: FormData;
@@ -30,8 +30,8 @@ export default function FormPanel({
     onChange({ bank: { ...state.bank, ...patch } });
   };
 
-  const onChangeContract = (patch: Partial<FormData['contract']>) => {
-    onChange({ contract: { ...state.contract, ...patch } });
+  const onChangeTerms = (terms: NonNullable<FormData['terms']>) => {
+    onChange({ terms });
   };
 
   return (
@@ -53,11 +53,17 @@ export default function FormPanel({
           issueDate={state.issueDate}
           dueDate={state.dueDate}
           paymentSite={state.paymentSite}
+          customPaymentSite={state.customPaymentSite}
+          receiptPurpose={state.receiptPurpose}
+          manualPurpose={state.manualPurpose}
           onDocNoChange={(docNo) => onChange({ docNo })}
           onSubjectChange={(subject) => onChange({ subject })}
           onIssueDateChange={(issueDate) => onChange({ issueDate })}
           onDueDateChange={(dueDate) => onChange({ dueDate })}
           onPaymentSiteChange={(paymentSite) => onChange({ paymentSite })}
+          onCustomPaymentSiteChange={(customPaymentSite) => onChange({ customPaymentSite })}
+          onReceiptPurposeChange={(receiptPurpose) => onChange({ receiptPurpose })}
+          onManualPurposeChange={(manualPurpose) => onChange({ manualPurpose })}
         />
 
         <IssuerFields
@@ -86,12 +92,6 @@ export default function FormPanel({
           onChange={onChangeBank}
         />
 
-        <ContractFields
-          docType={state.docType}
-          contract={state.contract}
-          onChange={onChangeContract}
-        />
-
         {/* メモ欄 */}
         <div className="space-y-1">
           <label className="block text-xs font-medium text-slate-600">
@@ -104,6 +104,11 @@ export default function FormPanel({
             placeholder="その他特記事項があればご記入ください"
           />
         </div>
+
+        <TermsFields
+          terms={state.terms}
+          onChange={onChangeTerms}
+        />
       </div>
     </div>
   );
