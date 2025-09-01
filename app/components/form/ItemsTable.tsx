@@ -23,8 +23,8 @@ export default function ItemsTable({ docType, items, onItemChange, onAddItem, on
         <div className="space-y-1 min-w-[800px]">
         {/* Header */}
         <div className={`grid ${showDateColumn 
-          ? 'grid-cols-[minmax(5rem,auto)_minmax(10rem,1fr)_minmax(8rem,auto)_minmax(4rem,auto)_minmax(4rem,auto)_minmax(6rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(3rem,auto)]' 
-          : 'grid-cols-[minmax(10rem,1fr)_minmax(8rem,auto)_minmax(4rem,auto)_minmax(4rem,auto)_minmax(6rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(3rem,auto)]'
+          ? 'grid-cols-[minmax(5rem,auto)_minmax(10rem,1fr)_minmax(8rem,auto)_minmax(4rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(3rem,auto)]' 
+          : 'grid-cols-[minmax(10rem,1fr)_minmax(8rem,auto)_minmax(4rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(3rem,auto)]'
         } gap-2 text-xs font-medium text-slate-700 bg-slate-50 p-2 rounded-t border-b border-slate-300`}>
           {showDateColumn && (
             <div className="text-center">
@@ -44,8 +44,8 @@ export default function ItemsTable({ docType, items, onItemChange, onAddItem, on
         {/* Items */}
         {items.map((item, index) => (
           <div key={index} className={`grid ${showDateColumn 
-            ? 'grid-cols-[minmax(5rem,auto)_minmax(10rem,1fr)_minmax(8rem,auto)_minmax(4rem,auto)_minmax(4rem,auto)_minmax(6rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(3rem,auto)]' 
-            : 'grid-cols-[minmax(10rem,1fr)_minmax(8rem,auto)_minmax(4rem,auto)_minmax(4rem,auto)_minmax(6rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(3rem,auto)]'
+            ? 'grid-cols-[minmax(5rem,auto)_minmax(10rem,1fr)_minmax(8rem,auto)_minmax(4rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(3rem,auto)]' 
+            : 'grid-cols-[minmax(10rem,1fr)_minmax(8rem,auto)_minmax(4rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(5rem,auto)_minmax(6rem,auto)_minmax(3rem,auto)]'
           } gap-2 items-start py-2 px-2 border-b border-slate-200 hover:bg-slate-50`}>
             {showDateColumn && (
               <div>

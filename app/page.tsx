@@ -8,10 +8,10 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-8 items-center">
           <div>
             <h1 className="text-balance leading-tight">
-              <span className="block text-4xl md:text-5xl font-extrabold tracking-tight">
+              <span className="block text-4xl md:text-5xl font-bold tracking-wide" style={{ fontFamily: '"Hiragino Sans", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3", "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "Noto Sans JP", sans-serif' }}>
                 かんたん帳票
               </span>
-              <span className="mt-2 block text-xl md:text-2xl font-medium text-slate-800">
+              <span className="mt-2 block text-xl md:text-2xl font-normal text-slate-700" style={{ fontFamily: '"Hiragino Sans", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3", "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "Noto Sans JP", sans-serif' }}>
                 ブラウザだけで、見積→請求→PDF。
               </span>
             </h1>
