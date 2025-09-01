@@ -10,11 +10,11 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
   icons: {
     icon: [
-      { url: '/favicon.ico?v=6' },
-      { url: '/icon.png?v=6', type: 'image/png', sizes: 'any' },
+      { url: '/favicon.ico?v=7' },
+      { url: '/icon.png?v=7', type: 'image/png', sizes: 'any' },
     ],
-    apple: [{ url: '/apple-icon.png?v=6', sizes: '180x180', type: 'image/png' }],
-    shortcut: ['/favicon.ico?v=6'],
+    apple: [{ url: '/apple-icon.png?v=7', sizes: '180x180', type: 'image/png' }],
+    shortcut: ['/favicon.ico?v=7'],
   },
   openGraph: {
     title: "かんたん帳票 — ブラウザだけで、見積→請求→PDF。",
