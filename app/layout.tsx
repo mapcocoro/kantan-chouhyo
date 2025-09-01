@@ -10,27 +10,11 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
   icons: {
     icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+      { url: '/favicon.ico?v=5', rel: 'icon' },
+      { url: '/icon.png?v=5', type: 'image/png', sizes: '512x512' },
     ],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-    other: [
-      {
-        rel: "android-chrome",
-        url: "/android-chrome-192x192.png",
-        sizes: "192x192",
-        type: "image/png"
-      },
-      {
-        rel: "android-chrome",
-        url: "/android-chrome-512x512.png", 
-        sizes: "512x512",
-        type: "image/png"
-      }
-    ],
+    apple: [{ url: '/apple-icon.png?v=5', sizes: '180x180', type: 'image/png' }],
+    shortcut: [{ url: '/favicon.ico?v=5' }],
   },
   openGraph: {
     title: "かんたん帳票 — ブラウザだけで、見積→請求→PDF。",
