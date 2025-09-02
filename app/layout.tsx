@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "./config/contact";
 import { IS_BETA } from "./config/site";
+import { ADS_ENABLED } from "@/lib/flags";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://chouhyo.cocoroai.co.jp'),
@@ -103,6 +104,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {IS_BETA && (
               <div className="md:col-span-2 text-xs text-slate-500">
                 現在はベータ運用中です。仕様は予告なく変更となる場合があります。
+              </div>
+            )}
+            {ADS_ENABLED && (
+              <div className="md:col-span-2 text-xs text-slate-500">
+                当サイトはアフィリエイト広告を利用しています。
               </div>
             )}
           </div>
