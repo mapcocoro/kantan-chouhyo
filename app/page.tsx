@@ -1,3 +1,7 @@
+import AdSlot from "@/app/components/AdSlot";
+import { RAKU_468x60, RAKU_234x60 } from "@/app/constants/ads";
+import { ADS_ENABLED } from "@/lib/flags";
+
 export const dynamic = 'force-static';
 
 
@@ -44,6 +48,25 @@ export default function LandingPage() {
           <p className="mt-2 text-sm text-slate-700 text-pretty">登録番号や税率別集計など、基本項目を網羅。※最終確認は各自でお願いします。</p>
         </div>
       </section>
+
+      {ADS_ENABLED && (
+        <section className="max-w-6xl mx-auto px-4 py-8 no-print">
+          {/* デスクトップ用：468×60 */}
+          <AdSlot
+            html={RAKU_468x60}
+            width={468}
+            height={60}
+            className="hidden md:block mx-auto"
+          />
+          {/* モバイル用：234×60 */}
+          <AdSlot
+            html={RAKU_234x60}
+            width={234}
+            height={60}
+            className="md:hidden mx-auto"
+          />
+        </section>
+      )}
 
     </div>
   );
