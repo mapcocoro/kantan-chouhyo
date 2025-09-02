@@ -12,6 +12,7 @@
 - **インボイス対応**: 適格請求書発行事業者登録番号、税率別集計に対応
 - **URL共有**: 入力内容をURLで共有可能
 - **印刷/PDF**: ブラウザの印刷機能でPDF保存
+- **広告表示**: 楽天アフィリエイト広告対応（環境変数で制御）
 
 ## 🛠 技術スタック
 
@@ -64,14 +65,18 @@ kantan-chouhyo/
 │   │   │   ├── InvoicePreview.tsx       # 請求書
 │   │   │   ├── PurchaseOrderPreview.tsx # 発注書
 │   │   │   └── ReceiptPreview.tsx       # 領収書
-│   │   └── ui/           # UIコンポーネント
+│   │   ├── ui/           # UIコンポーネント
+│   │   └── AdSlot.tsx    # 広告表示コンポーネント
 │   ├── lib/              # ユーティリティ関数
 │   │   ├── types.ts      # TypeScript型定義
 │   │   ├── calc.ts       # 計算ロジック
 │   │   └── format.ts     # フォーマット関数
 │   ├── constants/        # 定数定義
+│   │   └── ads.ts        # 広告HTML定義
 │   ├── layout.tsx        # ルートレイアウト
 │   └── globals.css       # グローバルCSS（印刷用含む）
+├── lib/                  # アプリケーション共通ライブラリ
+│   └── flags.ts          # 機能フラグ管理
 ├── public/               # 静的ファイル
 │   ├── favicon.ico       # ファビコン（32×32）
 │   ├── icon.png          # アイコン元画像（512×512）
@@ -96,6 +101,12 @@ npm run build
 # 静的エクスポート（必要な場合）
 npm run build && npm run export
 ```
+
+### 環境変数
+
+| 変数名 | 説明 | デフォルト値 |
+|--------|------|------------|
+| `NEXT_PUBLIC_ENABLE_ADS` | 広告表示フラグ（1で表示、0または未設定で非表示） | - |
 
 ## 🔧 開発ガイド
 
