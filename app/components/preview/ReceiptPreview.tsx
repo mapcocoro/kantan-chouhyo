@@ -74,28 +74,28 @@ export default function ReceiptPreview({ data, grandTotal }: Props) {
 
       {/* 明細（簡略版） */}
       {(data?.items || []).length > 0 && (
-        <div className="mb-8">
+        <div className="mb-8 overflow-x-auto">
           {/* ヘッダー */}
-          <div className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] text-[12px] font-semibold text-slate-700 tracking-wide">
-            <div className="px-3 py-2 border-b border-slate-300">内容</div>
-            <div className="px-3 py-2 border-b border-slate-300 text-center">数量</div>
-            <div className="px-3 py-2 border-b border-slate-300 text-right">金額</div>
+          <div className="grid grid-cols-[1fr_3rem_5rem] sm:grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] text-[11px] sm:text-[12px] font-semibold text-slate-700 tracking-wide min-w-[280px]">
+            <div className="px-2 sm:px-3 py-2 border-b border-slate-300">内容</div>
+            <div className="px-1 sm:px-3 py-2 border-b border-slate-300 text-center">数量</div>
+            <div className="px-1 sm:px-3 py-2 border-b border-slate-300 text-right">金額</div>
           </div>
           
           {/* 明細行 */}
           {(data?.items || []).map((item, index) => (
-            <div key={index} className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] text-[14px] text-slate-800 row">
-              <div className="px-3 py-2 whitespace-pre-wrap break-words">{item?.name || '—'}</div>
-              <div className="px-3 py-2 text-center">{item?.qty || 1}</div>
-              <div className="px-3 py-2 text-right tnum">¥{formatCurrency((item?.qty || 1) * (item?.unitPrice || 0))}</div>
+            <div key={index} className="grid grid-cols-[1fr_3rem_5rem] sm:grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] text-[12px] sm:text-[14px] text-slate-800 row min-w-[280px]">
+              <div className="px-2 sm:px-3 py-2 whitespace-pre-wrap break-words">{item?.name || '—'}</div>
+              <div className="px-1 sm:px-3 py-2 text-center">{item?.qty || 1}</div>
+              <div className="px-1 sm:px-3 py-2 text-right tnum text-[11px] sm:text-[14px]">¥{formatCurrency((item?.qty || 1) * (item?.unitPrice || 0))}</div>
             </div>
           ))}
           
           {/* 合計行 */}
-          <div className="grid grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] border-t border-slate-300 text-[15px] font-bold">
-            <div className="px-3 py-2"></div>
-            <div className="px-3 py-2 text-center">合計</div>
-            <div className="px-3 py-2 text-right tnum">¥{formatCurrency(grandTotal)}</div>
+          <div className="grid grid-cols-[1fr_3rem_5rem] sm:grid-cols-[1fr_minmax(5rem,auto)_minmax(7rem,auto)] border-t border-slate-300 text-[13px] sm:text-[15px] font-bold min-w-[280px]">
+            <div className="px-2 sm:px-3 py-2"></div>
+            <div className="px-1 sm:px-3 py-2 text-center">合計</div>
+            <div className="px-1 sm:px-3 py-2 text-right tnum">¥{formatCurrency(grandTotal)}</div>
           </div>
         </div>
       )}
