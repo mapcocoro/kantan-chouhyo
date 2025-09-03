@@ -1,6 +1,7 @@
 import Tooltip from '../ui/Tooltip';
 import type { DocumentType } from '../../lib/types';
 import { PAYMENT_TERMS_PRESETS } from '../../lib/types';
+import { calculateDueDate } from '../../lib/calculateDueDate';
 
 interface Props {
   docType: DocumentType;
@@ -90,7 +91,17 @@ export default function BasicFields({
             type="date"
             className={inputCls}
             value={issueDate}
-            onChange={(e) => onIssueDateChange(e.target.value)}
+            onChange={(e) => {
+              const newIssueDate = e.target.value;
+              onIssueDateChange(newIssueDate);
+              // 発行日を変更したときも、支払条件が設定されていれば支払期日を再計算
+              if (paymentSite && paymentSite !== 'その他（自由入力）') {
+                const calculatedDueDate = calculateDueDate(newIssueDate, paymentSite);
+                if (calculatedDueDate) {
+                  onDueDateChange(calculatedDueDate);
+                }
+              }
+            }}
           />
         </div>
       </div>
@@ -129,7 +140,15 @@ export default function BasicFields({
             <select
               className={inputCls}
               value={paymentSite || PAYMENT_TERMS_PRESETS[0]}
-              onChange={(e) => onPaymentSiteChange(e.target.value)}
+              onChange={(e) => {
+                const newPaymentSite = e.target.value;
+                onPaymentSiteChange(newPaymentSite);
+                // 支払条件を選択したら自動で支払期日を計算
+                const calculatedDueDate = calculateDueDate(issueDate, newPaymentSite);
+                if (calculatedDueDate) {
+                  onDueDateChange(calculatedDueDate);
+                }
+              }}
             >
               {PAYMENT_TERMS_PRESETS.map((preset) => (
                 <option key={preset} value={preset}>{preset}</option>
