@@ -31,7 +31,7 @@ export default function InvoicePreview({ data, subTotal, taxTotal, grandTotal }:
       {/* 宛先 */}
       <div className="mb-4">
         <div className="text-base font-semibold">
-          {data?.client?.name || '—'} 御中
+          {data?.client?.name || '—'}{data?.client?.honorific ? ` ${data.client.honorific}` : ' 御中'}
         </div>
         {data?.client?.zip && data?.client?.addr && (
           <div className="text-sm mt-2 text-slate-600">

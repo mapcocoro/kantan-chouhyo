@@ -1,5 +1,6 @@
 import { useAddressLookup } from '../../hooks/useAddressLookup';
 import type { Client, DocumentType } from '../../lib/types';
+import { HONORIFIC_OPTIONS } from '../../lib/types';
 
 interface Props {
   docType: DocumentType;
@@ -36,17 +37,36 @@ export default function ClientFields({ docType, client, onChange }: Props) {
     <div className="space-y-3">
       <h3 className="text-sm font-semibold text-slate-700">{getTitle()}</h3>
       
-      <div className="space-y-1">
-        <label className="block text-xs font-medium text-slate-600">
-          事業者名 *
-        </label>
-        <input
-          type="text"
-          className={inputCls}
-          value={client.name || ''}
-          onChange={(e) => onChange({ name: e.target.value })}
-          placeholder="株式会社クライアント"
-        />
+      <div className="grid grid-cols-3 gap-2">
+        <div className="col-span-2 space-y-1">
+          <label className="block text-xs font-medium text-slate-600">
+            事業者名 *
+          </label>
+          <input
+            type="text"
+            className={inputCls}
+            value={client.name || ''}
+            onChange={(e) => onChange({ name: e.target.value })}
+            placeholder="株式会社クライアント"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="block text-xs font-medium text-slate-600">
+            敬称
+          </label>
+          <select
+            className={inputCls}
+            value={client.honorific || '御中'}
+            onChange={(e) => onChange({ honorific: e.target.value })}
+          >
+            {HONORIFIC_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option || '（なし）'}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-2">

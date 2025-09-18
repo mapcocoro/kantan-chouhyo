@@ -17,6 +17,7 @@ export interface Client {
   name: string;
   zip: string;
   addr: string;
+  honorific?: string;
 }
 
 // 銀行口座情報
@@ -86,6 +87,14 @@ export const UNIT_OPTIONS = [
   '式', '個', '件', '時間', '日', '月', '人時', 
   'セット', '本', '台', '箇所', '枚', 
   'ライセンス', '㎡', 'm', 'kg', 'GB'
+];
+
+// 敬称候補配列
+export const HONORIFIC_OPTIONS = [
+  '御中',
+  '様',
+  '先生',
+  ''
 ];
 
 // デフォルト特約文
