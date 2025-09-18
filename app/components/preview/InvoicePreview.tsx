@@ -24,6 +24,7 @@ export default function InvoicePreview({ data, subTotal, taxTotal, grandTotal }:
         <div className="text-xs text-right text-slate-500 mb-2">
           <div>書類番号：{data?.docNo || 'INV-YYYYMM-001'}</div>
           <div>請求日：{formatYMD(data?.issueDate)}</div>
+          {data?.dueDate && <div>支払期限：{formatYMD(data.dueDate)}</div>}
         </div>
         <div className="border-b border-slate-300 mb-4"></div>
       </div>
