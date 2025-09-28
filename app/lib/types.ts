@@ -45,6 +45,29 @@ export interface Terms {
   text: string;
 }
 
+// 発注条件の型定義
+export interface OrderTerms {
+  delivery: {
+    type: 'perLine' | 'date' | 'period' | 'other';
+    date?: string;
+    periodStart?: string;
+    periodEnd?: string;
+    period?: string;
+    free?: string;
+  };
+  acceptance: {
+    type: 'after_7' | 'after_10' | 'after_30' | 'none' | 'milestone' | 'custom';
+    days?: number;
+    dayKind?: 'business' | 'calendar';
+    note?: string;
+  };
+  payment: {
+    type: 'site_30' | 'site_60' | 'days_after' | 'on_delivery' | 'per_delivery';
+    days?: number;
+    dayKind?: 'business' | 'calendar';
+  };
+}
+
 // 基本帳票データ
 export interface FormData {
   docType: DocumentType;
@@ -61,7 +84,10 @@ export interface FormData {
   bank?: Bank;
   items: Item[];
   memo?: string;
-  
+
+  // 発注条件
+  orderTerms?: OrderTerms;
+
   // 簡易特約フッター
   terms?: Terms;
 }
@@ -77,9 +103,7 @@ export const PAYMENT_TERMS_PRESETS = [
   '検収完了後 7 日以内支払い',
   '検収完了後 30 日以内支払い',
   '納品後 7 日以内支払い',
-  '納品後 30 日以内支払い',
-  '前払い（着手金）〇％・残金：納品時',
-  'その他（自由入力）'
+  '納品後 30 日以内支払い'
 ];
 
 // 単位候補配列

@@ -95,7 +95,7 @@ export default function BasicFields({
               const newIssueDate = e.target.value;
               onIssueDateChange(newIssueDate);
               // 発行日を変更したときも、支払条件が設定されていれば支払期日を再計算
-              if (paymentSite && paymentSite !== 'その他（自由入力）') {
+              if (paymentSite) {
                 const calculatedDueDate = calculateDueDate(newIssueDate, paymentSite);
                 if (calculatedDueDate) {
                   onDueDateChange(calculatedDueDate);
@@ -123,13 +123,14 @@ export default function BasicFields({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <label className="block text-xs font-medium text-slate-600">
-              支払期日
+              支払期日{docType === 'invoice' ? ' *' : ''}
             </label>
             <input
               type="date"
               className={inputCls}
               value={dueDate || ''}
               onChange={(e) => onDueDateChange(e.target.value)}
+              required={docType === 'invoice'}
             />
           </div>
 
@@ -154,15 +155,6 @@ export default function BasicFields({
                 <option key={preset} value={preset}>{preset}</option>
               ))}
             </select>
-            {paymentSite === 'その他（自由入力）' && (
-              <input
-                type="text"
-                className={`${inputCls} mt-2`}
-                value={customPaymentSite || ''}
-                onChange={(e) => onCustomPaymentSiteChange?.(e.target.value)}
-                placeholder="支払条件を入力してください"
-              />
-            )}
           </div>
         </div>
       )}

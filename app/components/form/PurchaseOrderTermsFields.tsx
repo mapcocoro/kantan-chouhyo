@@ -1,52 +1,8 @@
 import React from 'react';
+import type { OrderTerms } from '../../lib/types';
 
-// ローカル型定義
-export type DayKind = 'business' | 'calendar';
-
-export type AcceptanceType =
-  | 'after_7'
-  | 'after_10'
-  | 'after_30'
-  | 'none'
-  | 'milestone'
-  | 'custom';
-
-export interface Acceptance {
-  type: AcceptanceType;
-  days?: number;
-  dayKind?: DayKind;
-  note?: string;
-}
-
-export type PaymentTermType =
-  | 'site_30'
-  | 'site_60'
-  | 'days_after'
-  | 'on_delivery'
-  | 'prepaid'
-  | 'per_delivery'
-  | 'custom';
-
-export interface PaymentTerm {
-  type: PaymentTermType;
-  days?: number;
-  dayKind?: DayKind;
-  depositPct?: number;
-  note?: string;
-}
-
-export interface OrderTerms {
-  delivery: { 
-    type: 'perLine' | 'date' | 'period' | 'other'; 
-    date?: string; 
-    periodStart?: string;
-    periodEnd?: string;
-    period?: string; 
-    free?: string;
-  };
-  acceptance: Acceptance;
-  payment: PaymentTerm;
-}
+type AcceptanceType = OrderTerms['acceptance']['type'];
+type PaymentTermType = OrderTerms['payment']['type'];
 
 interface Props {
   terms: OrderTerms | undefined;
@@ -99,13 +55,9 @@ export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, 
   const handlePaymentChange = (type: PaymentTermType) => {
     const newTerms = { ...terms };
     newTerms.payment = { type };
-    
+
     // デフォルト値を設定
     if (type === 'days_after') {
-      newTerms.payment.days = 30;
-      newTerms.payment.dayKind = 'business';
-    } else if (type === 'prepaid') {
-      newTerms.payment.depositPct = 50;
       newTerms.payment.days = 30;
       newTerms.payment.dayKind = 'business';
     }
@@ -287,9 +239,7 @@ export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, 
             <option value="site_60">検収後 月末締め・翌々月末払い</option>
             <option value="days_after">検収後 ◯日以内 に振込</option>
             <option value="on_delivery">納品時支払</option>
-            <option value="prepaid">前払（着手金◯％／残金は検収後◯日以内）</option>
             <option value="per_delivery">都度払い</option>
-            <option value="custom">その他（自由入力）</option>
           </select>
           
           {/* days_after: 日数入力 + 営業日/暦日 */}
@@ -338,78 +288,6 @@ export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, 
             </div>
           )}
           
-          {/* prepaid: 着手金% + 残金日数 */}
-          {terms.payment.type === 'prepaid' && (
-            <div className="flex items-center gap-1">
-              <span className="text-sm text-slate-600">着手金</span>
-              <input
-                type="number"
-                value={terms.payment.depositPct || 50}
-                onChange={(e) => onChange({
-                  ...terms,
-                  payment: { ...terms.payment, depositPct: parseInt(e.target.value) || 50 }
-                })}
-                className="w-12 text-sm px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-sky-500"
-                min="1"
-                max="100"
-              />
-              <span className="text-sm text-slate-600">% 残金</span>
-              <input
-                type="number"
-                value={terms.payment.days || 30}
-                onChange={(e) => onChange({
-                  ...terms,
-                  payment: { ...terms.payment, days: parseInt(e.target.value) || 30 }
-                })}
-                className="w-16 text-sm px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-sky-500"
-                min="1"
-                max="365"
-              />
-              <button
-                type="button"
-                onClick={() => onChange({
-                  ...terms,
-                  payment: { ...terms.payment, dayKind: 'business' }
-                })}
-                className={`px-2 py-1 text-xs rounded ${
-                  terms.payment.dayKind === 'business' 
-                    ? 'bg-sky-100 text-sky-700 border border-sky-300' 
-                    : 'bg-white text-slate-600 border border-slate-300'
-                }`}
-              >
-                営業日
-              </button>
-              <button
-                type="button"
-                onClick={() => onChange({
-                  ...terms,
-                  payment: { ...terms.payment, dayKind: 'calendar' }
-                })}
-                className={`px-2 py-1 text-xs rounded ${
-                  terms.payment.dayKind === 'calendar' 
-                    ? 'bg-sky-100 text-sky-700 border border-sky-300' 
-                    : 'bg-white text-slate-600 border border-slate-300'
-                }`}
-              >
-                暦日
-              </button>
-              <span className="text-sm text-slate-600">以内</span>
-            </div>
-          )}
-          
-          {/* カスタム入力 */}
-          {terms.payment.type === 'custom' && (
-            <input
-              type="text"
-              value={terms.payment.note || ''}
-              onChange={(e) => onChange({
-                ...terms,
-                payment: { ...terms.payment, note: e.target.value }
-              })}
-              placeholder="自由入力"
-              className="flex-1 text-sm px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-sky-500"
-            />
-          )}
         </div>
       </div>
     </fieldset>

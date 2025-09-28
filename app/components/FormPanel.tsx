@@ -1,4 +1,4 @@
-import type { FormData } from '../lib/types';
+import type { FormData, OrderTerms } from '../lib/types';
 import DocumentTypeSelector from './form/DocumentTypeSelector';
 import BasicFields from './form/BasicFields';
 import IssuerFields from './form/IssuerFields';
@@ -6,6 +6,7 @@ import ClientFields from './form/ClientFields';
 import ItemsTable from './form/ItemsTable';
 import BankFields from './form/BankFields';
 import TermsFields from './form/TermsFields';
+import PurchaseOrderTermsFields from './form/PurchaseOrderTermsFields';
 
 interface Props {
   state: FormData;
@@ -32,6 +33,10 @@ export default function FormPanel({
 
   const onChangeTerms = (terms: NonNullable<FormData['terms']>) => {
     onChange({ terms });
+  };
+
+  const onChangeOrderTerms = (orderTerms: OrderTerms) => {
+    onChange({ orderTerms });
   };
 
   return (
@@ -85,6 +90,13 @@ export default function FormPanel({
           onAddItem={onAddItem}
           onRemoveItem={onRemoveItem}
         />
+
+        {state.docType === 'purchaseOrder' && (
+          <PurchaseOrderTermsFields
+            terms={state.orderTerms}
+            onChange={onChangeOrderTerms}
+          />
+        )}
 
         <BankFields
           docType={state.docType}

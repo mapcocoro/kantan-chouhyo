@@ -15,6 +15,11 @@ export type PreviewData = {
 
 export default function PreviewPanel({ data, subTotal, taxTotal, grandTotal }: PreviewData) {
   const handlePrint = () => {
+    // 請求書の場合は支払期日が必須
+    if (data.docType === 'invoice' && !data.dueDate) {
+      alert('請求書では支払期日の入力が必要です。');
+      return;
+    }
     window.print();
   };
 

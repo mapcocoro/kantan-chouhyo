@@ -1,4 +1,4 @@
-import type { FormData } from '../../lib/types';
+import type { FormData, OrderTerms } from '../../lib/types';
 import { formatZip } from '../../lib/format';
 import { formatCurrency } from '../../lib/calc';
 
@@ -15,6 +15,62 @@ const formatYMD = (dateStr?: string): string => {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 };
 
+const getDeliveryText = (delivery?: OrderTerms['delivery']) => {
+  if (!delivery) return '各明細記載の通り';
+  switch (delivery.type) {
+    case 'perLine':
+      return '各明細記載の通り';
+    case 'date':
+      return delivery.date ? formatYMD(delivery.date) : '—';
+    case 'period':
+      return delivery.period || '—';
+    case 'other':
+      return delivery.free || '—';
+    default:
+      return '各明細記載の通り';
+  }
+};
+
+const getAcceptanceText = (acceptance?: OrderTerms['acceptance']) => {
+  if (!acceptance) return '納品後 7営業日以内 に検収';
+  const dayKind = acceptance.dayKind === 'calendar' ? '日' : '営業日';
+  switch (acceptance.type) {
+    case 'after_7':
+      return `納品後 7${dayKind}以内 に検収`;
+    case 'after_10':
+      return `納品後 10${dayKind}以内 に検収`;
+    case 'after_30':
+      return `納品後 30日以内 に検収`;
+    case 'none':
+      return '検収なし';
+    case 'milestone':
+      return '段階検収（中間・最終）';
+    case 'custom':
+      return acceptance.note || '—';
+    default:
+      return '納品後 7営業日以内 に検収';
+  }
+};
+
+const getPaymentText = (payment?: OrderTerms['payment']) => {
+  if (!payment) return '検収後 月末締め・翌月末払い';
+  const dayKind = payment.dayKind === 'calendar' ? '日' : '営業日';
+  switch (payment.type) {
+    case 'site_30':
+      return '検収後 月末締め・翌月末払い';
+    case 'site_60':
+      return '検収後 月末締め・翌々月末払い';
+    case 'days_after':
+      return `検収後 ${payment.days || 30}${dayKind}以内 に振込`;
+    case 'on_delivery':
+      return '納品時支払';
+    case 'per_delivery':
+      return '都度払い';
+    default:
+      return '検収後 月末締め・翌月末払い';
+  }
+};
+
 export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTotal }: Props) {
   return (
     <div className="doc print-compact preview-root max-w-none bg-white text-black text-sm leading-7">
@@ -24,6 +80,7 @@ export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTo
         <div className="text-xs text-right text-slate-500 mb-2">
           <div>発注番号：{data?.docNo || 'PO-YYYYMM-001'}</div>
           <div>発注日：{formatYMD(data?.issueDate)}</div>
+          {data?.dueDate && <div>支払期限：{formatYMD(data.dueDate)}</div>}
         </div>
         <div className="border-b border-slate-300 mb-4"></div>
       </div>
@@ -93,9 +150,9 @@ export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTo
       <div className="mb-6">
         <div className="font-medium mb-2">発注条件</div>
         <div className="text-sm">
-          <div>納期：各明細記載の通り</div>
-          <div>検収：納品後7日以内に実施</div>
-          <div>支払条件：検収後月末締め翌月末払い</div>
+          <div>納期：{getDeliveryText(data?.orderTerms?.delivery)}</div>
+          <div>検収：{getAcceptanceText(data?.orderTerms?.acceptance)}</div>
+          <div>支払条件：{getPaymentText(data?.orderTerms?.payment)}</div>
         </div>
       </div>
 
