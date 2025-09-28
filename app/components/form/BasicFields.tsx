@@ -10,7 +10,6 @@ interface Props {
   issueDate: string;
   dueDate?: string;
   paymentSite?: string;
-  customPaymentSite?: string;
   receiptPurpose?: string;
   manualPurpose?: boolean;
   onDocNoChange: (value: string) => void;
@@ -18,7 +17,6 @@ interface Props {
   onIssueDateChange: (value: string) => void;
   onDueDateChange: (value: string) => void;
   onPaymentSiteChange: (value: string) => void;
-  onCustomPaymentSiteChange?: (value: string) => void;
   onReceiptPurposeChange?: (value: string) => void;
   onManualPurposeChange?: (value: boolean) => void;
 }
@@ -32,7 +30,6 @@ export default function BasicFields({
   issueDate,
   dueDate,
   paymentSite,
-  customPaymentSite,
   receiptPurpose,
   manualPurpose,
   onDocNoChange,
@@ -40,7 +37,6 @@ export default function BasicFields({
   onIssueDateChange,
   onDueDateChange,
   onPaymentSiteChange,
-  onCustomPaymentSiteChange,
   onReceiptPurposeChange,
   onManualPurposeChange
 }: Props) {

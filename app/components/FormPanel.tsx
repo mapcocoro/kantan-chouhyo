@@ -58,7 +58,6 @@ export default function FormPanel({
           issueDate={state.issueDate}
           dueDate={state.dueDate}
           paymentSite={state.paymentSite}
-          customPaymentSite={state.customPaymentSite}
           receiptPurpose={state.receiptPurpose}
           manualPurpose={state.manualPurpose}
           onDocNoChange={(docNo) => onChange({ docNo })}
@@ -66,7 +65,6 @@ export default function FormPanel({
           onIssueDateChange={(issueDate) => onChange({ issueDate })}
           onDueDateChange={(dueDate) => onChange({ dueDate })}
           onPaymentSiteChange={(paymentSite) => onChange({ paymentSite })}
-          onCustomPaymentSiteChange={(customPaymentSite) => onChange({ customPaymentSite })}
           onReceiptPurposeChange={(receiptPurpose) => onChange({ receiptPurpose })}
           onManualPurposeChange={(manualPurpose) => onChange({ manualPurpose })}
         />
