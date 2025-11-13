@@ -8,7 +8,8 @@ export default function Disclaimer(){
         <li>当社は、本サービスの利用により生じたいかなる損害についても責任を負いません。</li>
         <li>広告を掲載する場合があります。広告内容の真偽・品質について当社は保証しません。</li>
       </ul>
-      <p className="mt-6">改定日：{new Date().toLocaleDateString('ja-JP')}</p>
+      <p className="mt-6 text-sm text-slate-600">制定日：2025年9月28日</p>
+      <p className="mt-1 text-sm text-slate-600">改定日：2025年9月28日</p>
     </div>
   );
 }

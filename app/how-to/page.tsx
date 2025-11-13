@@ -11,7 +11,7 @@ export default function HowTo(){
       )}
       <ol className="list-decimal pl-5 space-y-2 leading-7">
         <li><a href="/app" className="text-sky-600 hover:underline">アプリ</a>を開く</li>
-        <li>帳票タイプ（見積、発注、契約、請求、領収）を選ぶ</li>
+        <li>帳票タイプ（見積、発注、請求、領収）を選ぶ</li>
         <li>発行者・取引先・明細を入力する</li>
         <li>「印刷 / PDF保存」を押してPDFにする</li>
         <li>「共有リンクをコピー」でURLを相手へ共有（保存はされません）</li>
