@@ -39,17 +39,17 @@ select.input, textarea.input {
 }
 
 /* === 印刷・PDF最適化 === */
-@page { 
-  size: A4; 
+@page {
+  size: A4;
   margin: 15mm 12mm; /* 上下少し広めに */
-  
-  /* 日本語印刷最適化 */
-  @bottom-center {
-    content: counter(page);
-    font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
-    font-size: 9pt;
-    color: #666;
-  }
+
+  /* ブラウザが自動追加するヘッダー・フッターを消す */
+  @top-left { content: ""; }
+  @top-center { content: ""; }
+  @top-right { content: ""; }
+  @bottom-left { content: ""; }
+  @bottom-center { content: ""; }
+  @bottom-right { content: ""; }
 }
 
 @media print { 

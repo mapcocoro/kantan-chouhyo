@@ -98,6 +98,14 @@ input, select, textarea {
 @page {
   size: A4;
   margin: 12mm;
+
+  /* ブラウザが自動追加するヘッダー・フッターを消す */
+  @top-left { content: ""; }
+  @top-center { content: ""; }
+  @top-right { content: ""; }
+  @bottom-left { content: ""; }
+  @bottom-center { content: ""; }
+  @bottom-right { content: ""; }
 }
 
 @media print {
