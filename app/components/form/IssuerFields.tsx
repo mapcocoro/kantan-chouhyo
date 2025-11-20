@@ -58,7 +58,8 @@ export default function IssuerFields({ docType, issuer, onChange }: Props) {
       estimate: '発行者（自社）',
       invoice: '請求者（自社）',
       purchaseOrder: '発注者（自社）',
-      receipt: '領収者（自社）'
+      receipt: '領収者（自社）',
+      outsourcingContract: '委託者（自社）'
     };
     return titleMap[docType] || '発行者（自社）';
   };

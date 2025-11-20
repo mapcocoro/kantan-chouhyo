@@ -45,7 +45,8 @@ export default function BasicFields({
       estimate: '見積番号',
       invoice: '請求書番号',
       purchaseOrder: '発注番号',
-      receipt: '領収書番号'
+      receipt: '領収書番号',
+      outsourcingContract: '契約書番号'
     };
     return labelMap[docType] || '書類番号';
   };
@@ -53,9 +54,10 @@ export default function BasicFields({
   const getIssueDateLabel = () => {
     const labelMap: Record<DocumentType, string> = {
       estimate: '見積日',
-      invoice: '請求日', 
+      invoice: '請求日',
       purchaseOrder: '発注日',
-      receipt: '領収日'
+      receipt: '領収日',
+      outsourcingContract: '契約日'
     };
     return labelMap[docType] || '発行日';
   };

@@ -28,7 +28,8 @@ export default function ClientFields({ docType, client, onChange }: Props) {
       estimate: '見積先',
       invoice: '請求先',
       purchaseOrder: '発注先',
-      receipt: '支払者'
+      receipt: '支払者',
+      outsourcingContract: '委託先'
     };
     return titleMap[docType] || '取引先';
   };
