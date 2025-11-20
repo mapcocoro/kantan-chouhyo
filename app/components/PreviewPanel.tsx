@@ -23,11 +23,6 @@ export default function PreviewPanel({ data, subTotal, taxTotal, grandTotal }: P
     window.print();
   };
 
-  const copyShareLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    alert('共有リンクをコピーしました');
-  };
-
   const renderPreview = () => {
     switch (data.docType) {
       case 'estimate':
@@ -48,18 +43,12 @@ export default function PreviewPanel({ data, subTotal, taxTotal, grandTotal }: P
       {/* プレビューヘッダー */}
       <div className="p-3 border-b bg-slate-50 no-print">
         <h3 className="text-sm font-semibold text-slate-600 mb-3">プレビュー</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="flex justify-center">
           <button
-            className="h-10 text-sm px-4 py-2 rounded-md bg-sky-600 text-white hover:bg-sky-700 font-medium"
+            className="h-10 text-sm px-4 py-2 rounded-md bg-sky-600 text-white hover:bg-sky-700 font-medium w-full sm:w-auto"
             onClick={handlePrint}
           >
             印刷 / PDF保存
-          </button>
-          <button
-            className="h-10 text-sm px-4 py-2 rounded-md border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 font-medium"
-            onClick={copyShareLink}
-          >
-            共有リンクをコピー
           </button>
         </div>
       </div>

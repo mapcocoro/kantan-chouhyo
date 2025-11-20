@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
+import { Noto_Sans_JP } from 'next/font/google';
 import "./globals.css";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "./config/contact";
 import { IS_BETA } from "./config/site";
 import { ADS_ENABLED } from "@/lib/flags";
+
+const notoSansJP = Noto_Sans_JP({
+  weight: ['300', '400', '500'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-noto-sans-jp',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://chouhyo.cocoroai.co.jp'),
@@ -66,7 +74,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja">
+    <html lang="ja" className={notoSansJP.variable}>
       <body className="min-h-screen bg-slate-50 text-slate-900">
         <header className="border-b bg-white no-print">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">

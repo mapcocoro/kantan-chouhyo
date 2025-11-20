@@ -20,13 +20,13 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="mt-4 text-slate-700 text-pretty measure">
-              保存なし・その場で印刷/PDF。URL共有にも対応。個人事業主や小規模事業向けの超シンプル帳票ツールです。
+              ブラウザ完結・その場で印刷/PDF。入力内容は自動保存。個人事業主や小規模事業向けの超シンプル帳票ツールです。
             </p>
             <div className="mt-6 flex gap-3">
               <a className="inline-flex items-center justify-center rounded-xl border border-transparent bg-sky-600 px-4 py-2 text-white hover:bg-sky-700" href="/app">アプリを開く（無料）</a>
               <a className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-slate-700 hover:bg-slate-50" href="/how-to">使い方を見る</a>
             </div>
-            <p className="mt-3 text-xs text-slate-500">※ 現在β版：入力内容はサーバに保存されません。共有リンクに入力情報が含まれます。</p>
+            <p className="mt-3 text-xs text-slate-500">※ 現在β版：入力内容はブラウザのローカルストレージに自動保存されます（サーバーには送信されません）。</p>
           </div>
           <div className="bg-white rounded-2xl shadow-sm border p-4">
             <img src="/og.png" alt="画面イメージ" className="rounded-lg w-full h-auto"/>
@@ -40,8 +40,8 @@ export default function LandingPage() {
           <p className="mt-2 text-sm text-slate-700 text-pretty">まずはPDF出力だけ。面倒なアカウント作成や審査なしで使い始められます。</p>
         </div>
         <div className="bg-white border rounded-2xl p-5">
-          <h3 className="font-semibold">URL共有OK</h3>
-          <p className="mt-2 text-sm text-slate-700 text-pretty">入力内容はURLハッシュにエンコード。保存しない運用でも、相手と素早く共有できます。</p>
+          <h3 className="font-semibold">自動保存で安心</h3>
+          <p className="mt-2 text-sm text-slate-700 text-pretty">入力内容はブラウザに自動保存。途中で閉じても次回アクセス時に復元されます。</p>
         </div>
         <div className="bg-white border rounded-2xl p-5">
           <h3 className="font-semibold">インボイス対応レイアウト</h3>

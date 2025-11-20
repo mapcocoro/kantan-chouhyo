@@ -20,7 +20,7 @@ export default function EstimatePreview({ data, subTotal, taxTotal, grandTotal }
     <div className="doc print-compact preview-root max-w-none bg-white text-black text-sm leading-7">
       {/* ヘッダー */}
       <div className="text-center mb-4">
-        <h1 className="text-2xl font-extrabold tracking-wide mb-3">見積書</h1>
+        <h1 className="text-3xl font-light tracking-wider mb-3" style={{ fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>見積書</h1>
         <div className="text-xs text-right text-slate-500 mb-2">
           <div>書類番号：{data?.docNo || 'QTE-YYYYMM-001'}</div>
           <div>発行日：{formatYMD(data?.issueDate)}</div>

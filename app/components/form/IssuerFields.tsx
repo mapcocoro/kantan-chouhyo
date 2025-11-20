@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Tooltip from '../ui/Tooltip';
 import { useAddressLookup } from '../../hooks/useAddressLookup';
 import type { Issuer, DocumentType } from '../../lib/types';
@@ -12,6 +13,7 @@ const inputCls = "h-7 w-full text-xs px-2 py-1 rounded border border-slate-300 b
 
 export default function IssuerFields({ docType, issuer, onChange }: Props) {
   const { lookupAddress } = useAddressLookup();
+  const [regNoError, setRegNoError] = useState<string>('');
 
   const handleZipChange = async (zip: string) => {
     onChange({ zip });
@@ -21,6 +23,34 @@ export default function IssuerFields({ docType, issuer, onChange }: Props) {
         onChange({ addr: address.fullAddress });
       }
     }
+  };
+
+  // 登録番号の処理（T + 13桁の数字）
+  const handleRegNoChange = (value: string) => {
+    // 数字のみを許可
+    const numbersOnly = value.replace(/[^0-9]/g, '');
+
+    // 13桁を超える入力は無視
+    if (numbersOnly.length > 13) {
+      return;
+    }
+
+    // Tプレフィックス付きで保存
+    const regNo = numbersOnly ? `T${numbersOnly}` : '';
+    onChange({ regNo });
+
+    // バリデーション
+    if (numbersOnly.length > 0 && numbersOnly.length !== 13) {
+      setRegNoError('登録番号は13桁の数字で入力してください');
+    } else {
+      setRegNoError('');
+    }
+  };
+
+  // 表示用：Tを除いた数字部分を取得
+  const getRegNoDisplayValue = () => {
+    if (!issuer.regNo) return '';
+    return issuer.regNo.replace(/^T/, '');
   };
 
   const getTitle = () => {
@@ -100,14 +130,23 @@ export default function IssuerFields({ docType, issuer, onChange }: Props) {
               <span className="inline-block w-3 h-3 rounded-full bg-slate-400 text-white text-[10px] leading-3 text-center cursor-help">?</span>
             </Tooltip>
           </label>
-          <input
-            type="text"
-            className={inputCls}
-            value={issuer.regNo || ''}
-            onChange={(e) => onChange({ regNo: e.target.value })}
-            placeholder="T1234567890123"
-            maxLength={14}
-          />
+          <div className="relative">
+            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-700 pointer-events-none">
+              T
+            </div>
+            <input
+              type="text"
+              className={`${inputCls} pl-5 ${regNoError ? 'border-red-400 focus:ring-red-300 focus:border-red-400' : ''}`}
+              value={getRegNoDisplayValue()}
+              onChange={(e) => handleRegNoChange(e.target.value)}
+              placeholder="1234567890123"
+              maxLength={13}
+              inputMode="numeric"
+            />
+          </div>
+          {regNoError && (
+            <p className="text-xs text-red-600 mt-0.5">{regNoError}</p>
+          )}
         </div>
       )}
     </div>
