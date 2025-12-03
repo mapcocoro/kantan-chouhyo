@@ -6,15 +6,15 @@ import type { FormData, Item, DocumentType } from '../lib/types';
 import { DEFAULT_TERMS_TEXT } from '../lib/types';
 import { calculateTotals } from '../lib/calc';
 import {
-  saveDraftData,
-  loadDraftData,
   saveIssuerSettings,
   loadIssuerSettings,
   saveClientSettings,
   loadClientSettings,
   clearClientSettings,
   isSaveClientDisabled,
-  setSaveClientDisabled
+  setSaveClientDisabled,
+  saveBankSettings,
+  loadBankSettings
 } from '../lib/storage';
 
 // 帳票種別ごとのデフォルト備考テンプレート
@@ -66,26 +66,24 @@ export default function Page() {
   const [saveClientDisabled, setLocalSaveClientDisabled] = useState(false);
   const prevDocTypeRef = useRef<DocumentType>(state.docType);
 
-  // コンポーネントマウント時にlocalStorageからデータを復元
+  // コンポーネントマウント時にlocalStorageから保持すべき項目のみ復元
+  // 保持: 自社情報、取引先情報、振込先情報
+  // リセット: 件名、明細、備考、書類番号、発行日、支払期限
   useEffect(() => {
     // クライアント情報保存の無効化フラグを読み込み
     setLocalSaveClientDisabled(isSaveClientDisabled());
 
-    // 保存された下書きデータを復元
-    const savedDraft = loadDraftData();
-    if (savedDraft) {
-      setState(savedDraft);
-      prevDocTypeRef.current = savedDraft.docType;
-    } else {
-      // 下書きがない場合は発行元情報とクライアント情報を復元
-      const savedIssuer = loadIssuerSettings();
-      const savedClient = loadClientSettings();
-      setState(prev => ({
-        ...prev,
-        issuer: savedIssuer || prev.issuer,
-        client: savedClient || prev.client
-      }));
-    }
+    // 保持すべき項目のみ復元（下書き全体ではなく個別に）
+    const savedIssuer = loadIssuerSettings();
+    const savedClient = loadClientSettings();
+    const savedBank = loadBankSettings();
+
+    setState(prev => ({
+      ...prev,
+      issuer: savedIssuer || prev.issuer,
+      client: savedClient || prev.client,
+      bank: savedBank || prev.bank
+    }));
 
     setIsInitialized(true);
   }, []);
@@ -146,10 +144,10 @@ export default function Page() {
     }
   }, [state.docType, isInitialized]);
 
-  // 状態変更時に自動保存（初回マウント時は除く）
+  // 状態変更時に保持すべき項目のみ自動保存（初回マウント時は除く）
+  // 保持: 自社情報、取引先情報、振込先情報
   useEffect(() => {
     if (!isInitialized) return;
-    saveDraftData(state);
 
     // 発行元（自社）情報の自動保存
     // 発注書の場合は受注者欄（client）に自社情報があるので、そちらを保存
@@ -183,6 +181,11 @@ export default function Page() {
       if (!saveClientDisabled && state.client?.name) {
         saveClientSettings(state.client);
       }
+    }
+
+    // 振込先情報の自動保存（入力がある場合のみ）
+    if (state.bank?.name || state.bank?.number || state.bank?.holder) {
+      saveBankSettings(state.bank);
     }
   }, [state, isInitialized, saveClientDisabled]);
 

@@ -1,12 +1,13 @@
 // LocalStorage ユーティリティ
 
-import type { FormData, Issuer, Client } from './types';
+import type { FormData, Issuer, Client, Bank } from './types';
 
 // LocalStorageのキー名
 const STORAGE_KEYS = {
   DRAFT_DATA: 'chouhyo_current_draft_data',
   ISSUER_SETTINGS: 'chouhyo_user_profile_settings',
   CLIENT_SETTINGS: 'chouhyo_client_settings',
+  BANK_SETTINGS: 'chouhyo_bank_settings',
   SAVE_CLIENT_DISABLED: 'chouhyo_save_client_disabled',
 } as const;
 
@@ -155,5 +156,32 @@ export function isSaveClientDisabled(): boolean {
   } catch (error) {
     console.error('Failed to get save client disabled:', error);
     return false;
+  }
+}
+
+/**
+ * 振込先情報を保存
+ */
+export function saveBankSettings(bank: Bank): void {
+  try {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(STORAGE_KEYS.BANK_SETTINGS, JSON.stringify(bank));
+  } catch (error) {
+    console.error('Failed to save bank settings:', error);
+  }
+}
+
+/**
+ * 保存された振込先情報を読み込み
+ */
+export function loadBankSettings(): Bank | null {
+  try {
+    if (typeof window === 'undefined') return null;
+    const stored = localStorage.getItem(STORAGE_KEYS.BANK_SETTINGS);
+    if (!stored) return null;
+    return JSON.parse(stored) as Bank;
+  } catch (error) {
+    console.error('Failed to load bank settings:', error);
+    return null;
   }
 }
