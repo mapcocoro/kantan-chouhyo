@@ -129,6 +129,9 @@ export default function FormPanel({
           <PurchaseOrderTermsFields
             terms={state.orderTerms}
             onChange={onChangeOrderTerms}
+            issueDate={state.issueDate}
+            dueDate={state.dueDate}
+            onDueDateChange={(dueDate) => onChange({ dueDate })}
           />
         )}
 

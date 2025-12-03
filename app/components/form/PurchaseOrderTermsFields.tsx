@@ -1,5 +1,6 @@
 import React from 'react';
 import type { OrderTerms } from '../../lib/types';
+import { calculateOrderDueDate } from '../../lib/calculateDueDate';
 
 type AcceptanceType = OrderTerms['acceptance']['type'];
 type PaymentTermType = OrderTerms['payment']['type'];
@@ -7,6 +8,9 @@ type PaymentTermType = OrderTerms['payment']['type'];
 interface Props {
   terms: OrderTerms | undefined;
   onChange: (terms: OrderTerms) => void;
+  issueDate: string;
+  dueDate?: string;
+  onDueDateChange: (dueDate: string) => void;
 }
 
 // デフォルト値
@@ -16,7 +20,7 @@ const DEFAULT_ORDER_TERMS: OrderTerms = {
   payment: { type: 'site_30' }
 };
 
-export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, onChange }: Props) {
+export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, onChange, issueDate, dueDate, onDueDateChange }: Props) {
   // 納期の更新
   const handleDeliveryChange = (type: string) => {
     const newTerms = { ...terms };
@@ -62,6 +66,27 @@ export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, 
       newTerms.payment.dayKind = 'business';
     }
     onChange(newTerms);
+
+    // 支払期限を自動計算
+    const calculatedDueDate = calculateOrderDueDate(issueDate, newTerms.payment);
+    if (calculatedDueDate) {
+      onDueDateChange(calculatedDueDate);
+    }
+  };
+
+  // 支払日数変更時の処理
+  const handlePaymentDaysChange = (days: number) => {
+    const newTerms = {
+      ...terms,
+      payment: { ...terms.payment, days }
+    };
+    onChange(newTerms);
+
+    // 支払期限を再計算
+    const calculatedDueDate = calculateOrderDueDate(issueDate, newTerms.payment);
+    if (calculatedDueDate) {
+      onDueDateChange(calculatedDueDate);
+    }
   };
 
   return (
@@ -248,10 +273,7 @@ export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, 
               <input
                 type="number"
                 value={terms.payment.days || 30}
-                onChange={(e) => onChange({
-                  ...terms,
-                  payment: { ...terms.payment, days: parseInt(e.target.value) || 30 }
-                })}
+                onChange={(e) => handlePaymentDaysChange(parseInt(e.target.value) || 30)}
                 className="w-16 text-sm px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-sky-500"
                 min="1"
                 max="365"
@@ -264,8 +286,8 @@ export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, 
                   payment: { ...terms.payment, dayKind: 'business' }
                 })}
                 className={`px-2 py-1 text-xs rounded ${
-                  terms.payment.dayKind === 'business' 
-                    ? 'bg-sky-100 text-sky-700 border border-sky-300' 
+                  terms.payment.dayKind === 'business'
+                    ? 'bg-sky-100 text-sky-700 border border-sky-300'
                     : 'bg-white text-slate-600 border border-slate-300'
                 }`}
               >
@@ -278,8 +300,8 @@ export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, 
                   payment: { ...terms.payment, dayKind: 'calendar' }
                 })}
                 className={`px-2 py-1 text-xs rounded ${
-                  terms.payment.dayKind === 'calendar' 
-                    ? 'bg-sky-100 text-sky-700 border border-sky-300' 
+                  terms.payment.dayKind === 'calendar'
+                    ? 'bg-sky-100 text-sky-700 border border-sky-300'
                     : 'bg-white text-slate-600 border border-slate-300'
                 }`}
               >
@@ -287,7 +309,25 @@ export default function PurchaseOrderTermsFields({ terms = DEFAULT_ORDER_TERMS, 
               </button>
             </div>
           )}
-          
+
+        </div>
+      </div>
+
+      {/* 支払期限 */}
+      <div className="mt-4">
+        <label className="block text-xs font-medium text-slate-700 mb-1">
+          支払期限
+        </label>
+        <div className="flex items-center gap-2">
+          <input
+            type="date"
+            value={dueDate || ''}
+            onChange={(e) => onDueDateChange(e.target.value)}
+            className="text-sm px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-sky-500"
+          />
+          <span className="text-xs text-slate-500">
+            ※支払条件から自動計算されますが、手動で変更も可能です
+          </span>
         </div>
       </div>
     </fieldset>
