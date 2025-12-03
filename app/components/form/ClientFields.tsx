@@ -1,4 +1,5 @@
 import { useAddressLookup } from '../../hooks/useAddressLookup';
+import Tooltip from '../ui/Tooltip';
 import type { Client, DocumentType } from '../../lib/types';
 import { HONORIFIC_OPTIONS } from '../../lib/types';
 
@@ -25,18 +26,33 @@ export default function ClientFields({ docType, client, onChange }: Props) {
 
   const getTitle = () => {
     const titleMap: Record<DocumentType, string> = {
-      estimate: '見積先',
+      estimate: '提出先',
       invoice: '請求先',
-      purchaseOrder: '発注先',
-      receipt: '支払者',
-      outsourcingContract: '委託先'
+      purchaseOrder: '受注者',
+      receipt: '宛名'
     };
     return titleMap[docType] || '取引先';
   };
 
+  const getTooltipContent = () => {
+    if (docType === 'purchaseOrder') {
+      return '仕事を受け、代金を受け取る側です';
+    }
+    return null;
+  };
+
+  const tooltipContent = getTooltipContent();
+
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-slate-700">{getTitle()}</h3>
+      <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-1">
+        {getTitle()}
+        {tooltipContent && (
+          <Tooltip content={tooltipContent}>
+            <span className="inline-block w-3 h-3 rounded-full bg-slate-400 text-white text-[10px] leading-3 text-center cursor-help">?</span>
+          </Tooltip>
+        )}
+      </h3>
       
       <div className="grid grid-cols-3 gap-2">
         <div className="col-span-2 space-y-1">

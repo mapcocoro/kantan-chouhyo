@@ -5,12 +5,21 @@ import PreviewPanel, { PreviewData } from '../components/PreviewPanel';
 import type { FormData, Item, DocumentType } from '../lib/types';
 import { DEFAULT_TERMS_TEXT } from '../lib/types';
 import { calculateTotals } from '../lib/calc';
-import { saveDraftData, loadDraftData, saveIssuerSettings, loadIssuerSettings } from '../lib/storage';
+import {
+  saveDraftData,
+  loadDraftData,
+  saveIssuerSettings,
+  loadIssuerSettings,
+  saveClientSettings,
+  loadClientSettings,
+  clearClientSettings,
+  isSaveClientDisabled,
+  setSaveClientDisabled
+} from '../lib/storage';
 
 // 帳票種別ごとのデフォルト備考テンプレート
 const DEFAULT_MEMOS: Record<DocumentType, string> = {
   invoice: `お支払期限：YYYY年MM月DD日
-お振込先名義（カナ）：
 
 ・お支払期日までのお振込をお願いいたします。
 ・恐れ入りますが、振込手数料は貴社にてご負担をお願いいたします。
@@ -23,12 +32,11 @@ const DEFAULT_MEMOS: Record<DocumentType, string> = {
 
   purchaseOrder: `納期：YYYY年MM月DD日
 
-・本発注書受領後、請書の送付をお願いいたします。
-・支払条件：貴社規定（または別途相談）に従います。`,
+・本発注書受領後、注文請書の送付をお願いいたします。
+・納期は発注者からの素材・情報支給状況により変動する場合があります。`,
 
-  receipt: '',
-
-  outsourcingContract: '' // 業務委託契約書用（空欄）
+  receipt: `・本領収書は銀行振込確認後に発行しております。
+・再発行はいたしかねますので、大切に保管してください。`
 };
 
 export default function Page() {
@@ -55,30 +63,35 @@ export default function Page() {
 
   const [state, setState] = useState<FormData>(getDefaultState);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [saveClientDisabled, setLocalSaveClientDisabled] = useState(false);
   const prevDocTypeRef = useRef<DocumentType>(state.docType);
 
   // コンポーネントマウント時にlocalStorageからデータを復元
   useEffect(() => {
+    // クライアント情報保存の無効化フラグを読み込み
+    setLocalSaveClientDisabled(isSaveClientDisabled());
+
     // 保存された下書きデータを復元
     const savedDraft = loadDraftData();
     if (savedDraft) {
       setState(savedDraft);
       prevDocTypeRef.current = savedDraft.docType;
     } else {
-      // 下書きがない場合は発行元情報だけ復元
+      // 下書きがない場合は発行元情報とクライアント情報を復元
       const savedIssuer = loadIssuerSettings();
-      if (savedIssuer) {
-        setState(prev => ({
-          ...prev,
-          issuer: savedIssuer
-        }));
-      }
+      const savedClient = loadClientSettings();
+      setState(prev => ({
+        ...prev,
+        issuer: savedIssuer || prev.issuer,
+        client: savedClient || prev.client
+      }));
     }
 
     setIsInitialized(true);
   }, []);
 
   // 帳票種別が変更されたときに備考欄を更新（ユーザー編集がない場合のみ）
+  // また、発注書⇔他帳票の切り替え時に発行者/取引先を入れ替え
   useEffect(() => {
     if (!isInitialized) return;
 
@@ -89,13 +102,44 @@ export default function Page() {
     if (prevDocType !== currentDocType) {
       const prevDefaultMemo = DEFAULT_MEMOS[prevDocType];
       const currentMemo = state.memo || '';
+      const savedIssuer = loadIssuerSettings();
 
-      // 現在のメモが前回のデフォルト値と一致する場合のみ、新しいデフォルト値に更新
-      if (currentMemo === prevDefaultMemo) {
+      // 発注書から他の帳票に切り替えた場合
+      // → 受注者欄（client）にあった自社情報を発行者欄（issuer）に戻す
+      if (prevDocType === 'purchaseOrder' && currentDocType !== 'purchaseOrder') {
         setState(prev => ({
           ...prev,
-          memo: DEFAULT_MEMOS[currentDocType]
+          memo: currentMemo === prevDefaultMemo ? DEFAULT_MEMOS[currentDocType] : prev.memo,
+          // 受注者欄（client）にあった自社情報を発行者欄に戻し、取引先は空に
+          issuer: savedIssuer || prev.client as FormData['issuer'],
+          client: { name: '', zip: '', addr: '' }
         }));
+      }
+      // 他の帳票から発注書に切り替えた場合
+      // → 発行者欄（issuer）にあった自社情報を受注者欄（client）に移す
+      else if (prevDocType !== 'purchaseOrder' && currentDocType === 'purchaseOrder') {
+        setState(prev => ({
+          ...prev,
+          memo: currentMemo === prevDefaultMemo ? DEFAULT_MEMOS[currentDocType] : prev.memo,
+          // 自社情報（保存済み or 現在のissuer）を受注者欄に移す
+          client: {
+            name: savedIssuer?.name || prev.issuer.name || '',
+            zip: savedIssuer?.zip || prev.issuer.zip || '',
+            addr: savedIssuer?.addr || prev.issuer.addr || ''
+          },
+          // 発注者欄（issuer）は空に
+          issuer: { name: '', zip: '', addr: '', tel: '', regNo: '' }
+        }));
+      }
+      // それ以外（発注書以外の帳票間の切り替え）
+      else {
+        // 現在のメモが前回のデフォルト値と一致する場合のみ、新しいデフォルト値に更新
+        if (currentMemo === prevDefaultMemo) {
+          setState(prev => ({
+            ...prev,
+            memo: DEFAULT_MEMOS[currentDocType]
+          }));
+        }
       }
 
       prevDocTypeRef.current = currentDocType;
@@ -107,11 +151,40 @@ export default function Page() {
     if (!isInitialized) return;
     saveDraftData(state);
 
-    // 発行元情報も自動保存
-    if (state.issuer) {
-      saveIssuerSettings(state.issuer);
+    // 発行元（自社）情報の自動保存
+    // 発注書の場合は受注者欄（client）に自社情報があるので、そちらを保存
+    // それ以外の場合は発行者欄（issuer）を保存
+    if (state.docType === 'purchaseOrder') {
+      // 発注書の場合、受注者欄に自社情報がある
+      // 名前が入力されている場合のみ保存（空で上書きしないため）
+      if (state.client?.name) {
+        saveIssuerSettings({
+          name: state.client.name,
+          zip: state.client.zip || '',
+          addr: state.client.addr || '',
+          tel: '', // clientにはtelがないので空
+          regNo: '' // clientにはregNoがないので空
+        });
+      }
+      // 発注書の場合、発注者欄（issuer）が取引先情報
+      if (!saveClientDisabled && state.issuer?.name) {
+        saveClientSettings({
+          name: state.issuer.name,
+          zip: state.issuer.zip || '',
+          addr: state.issuer.addr || ''
+        });
+      }
+    } else {
+      // それ以外の帳票では発行者欄に自社情報がある
+      if (state.issuer?.name) {
+        saveIssuerSettings(state.issuer);
+      }
+      // 取引先情報の自動保存（無効でない場合のみ）
+      if (!saveClientDisabled && state.client?.name) {
+        saveClientSettings(state.client);
+      }
     }
-  }, [state, isInitialized]);
+  }, [state, isInitialized, saveClientDisabled]);
 
   // ---- ハンドラ（差分更新のユーティリティ） ----
   const onChange = (patch: Partial<FormData>) => setState(s => ({ ...s, ...patch }));
@@ -162,6 +235,29 @@ export default function Page() {
     prevDocTypeRef.current = 'estimate';
   };
 
+  // クライアント情報をクリア
+  const handleClearClient = () => {
+    clearClientSettings();
+    // 発注書の場合はissuer、それ以外はclientをクリア
+    if (state.docType === 'purchaseOrder') {
+      setState(s => ({
+        ...s,
+        issuer: { name: '', zip: '', addr: '', tel: '', regNo: '' }
+      }));
+    } else {
+      setState(s => ({
+        ...s,
+        client: { name: '', zip: '', addr: '' }
+      }));
+    }
+  };
+
+  // クライアント情報保存の有効/無効切り替え
+  const handleToggleSaveClient = (disabled: boolean) => {
+    setSaveClientDisabled(disabled);
+    setLocalSaveClientDisabled(disabled);
+  };
+
   // ---- 集計（税率混在も考慮するなら reduce で合算） ----
   const { subTotal, taxTotal, grandTotal } = useMemo(() => {
     return calculateTotals(state.items);
@@ -206,6 +302,9 @@ export default function Page() {
                 onChangeItem={onChangeItem}
                 onAddItem={onAddItem}
                 onRemoveItem={onRemoveItem}
+                saveClientDisabled={saveClientDisabled}
+                onToggleSaveClient={handleToggleSaveClient}
+                onClearClient={handleClearClient}
               />
             </div>
           </section>

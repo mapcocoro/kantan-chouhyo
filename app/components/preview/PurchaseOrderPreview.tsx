@@ -156,9 +156,9 @@ export default function PurchaseOrderPreview({ data, subTotal, taxTotal, grandTo
         </div>
       </div>
 
-      {/* 発行元 */}
+      {/* 発注者情報 */}
       <div className="text-right mt-6">
-        <div className="font-medium mb-2">発行元</div>
+        <div className="font-medium mb-2">発注者</div>
         <div className="text-[10px] text-slate-500">
           <div className="font-medium text-sm text-black">{data?.issuer?.name || '—'}</div>
           {data?.issuer?.zip && data?.issuer?.addr && (

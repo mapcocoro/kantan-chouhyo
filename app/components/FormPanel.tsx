@@ -16,6 +16,9 @@ interface Props {
   onChangeItem: (index: number, patch: Partial<FormData['items'][0]>) => void;
   onAddItem: () => void;
   onRemoveItem: (index: number) => void;
+  saveClientDisabled: boolean;
+  onToggleSaveClient: (disabled: boolean) => void;
+  onClearClient: () => void;
 }
 
 export default function FormPanel({
@@ -26,6 +29,9 @@ export default function FormPanel({
   onChangeItem,
   onAddItem,
   onRemoveItem,
+  saveClientDisabled,
+  onToggleSaveClient,
+  onClearClient,
 }: Props) {
   const onChangeBank = (patch: Partial<FormData['bank']>) => {
     onChange({ bank: { ...state.bank, ...patch } as FormData['bank'] });
@@ -50,6 +56,13 @@ export default function FormPanel({
           value={state.docType}
           onChange={(docType) => onChange({ docType })}
         />
+
+        {state.docType === 'purchaseOrder' && (
+          <div className="flex items-start gap-2 p-3 bg-sky-50 border border-sky-200 rounded-md text-xs text-sky-800">
+            <span className="text-base">💡</span>
+            <span>発注書は「発注者（依頼する側）」が「受注者（仕事を受ける側）」に発行する書類です。</span>
+          </div>
+        )}
 
         <BasicFields
           docType={state.docType}
@@ -80,6 +93,29 @@ export default function FormPanel({
           client={state.client}
           onChange={onChangeClient}
         />
+
+        {/* 取引先情報の管理オプション */}
+        <div className="flex flex-wrap items-center gap-3 text-xs">
+          <label className="flex items-center gap-1.5 text-slate-600 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={saveClientDisabled}
+              onChange={(e) => onToggleSaveClient(e.target.checked)}
+              className="rounded border-slate-300 text-sky-600 focus:ring-sky-300 w-3.5 h-3.5"
+            />
+            取引先情報を保存しない
+          </label>
+          <button
+            type="button"
+            onClick={onClearClient}
+            className="text-slate-500 hover:text-red-600 underline transition-colors"
+          >
+            取引先をクリア
+          </button>
+          <span className="text-slate-400 text-[10px]">
+            ※共有PCでは情報を削除してください
+          </span>
+        </div>
 
         <ItemsTable
           docType={state.docType}

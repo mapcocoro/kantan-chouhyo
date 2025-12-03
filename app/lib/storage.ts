@@ -1,11 +1,13 @@
 // LocalStorage ユーティリティ
 
-import type { FormData, Issuer } from './types';
+import type { FormData, Issuer, Client } from './types';
 
 // LocalStorageのキー名
 const STORAGE_KEYS = {
   DRAFT_DATA: 'chouhyo_current_draft_data',
   ISSUER_SETTINGS: 'chouhyo_user_profile_settings',
+  CLIENT_SETTINGS: 'chouhyo_client_settings',
+  SAVE_CLIENT_DISABLED: 'chouhyo_save_client_disabled',
 } as const;
 
 /**
@@ -83,5 +85,75 @@ export function clearIssuerSettings(): void {
     localStorage.removeItem(STORAGE_KEYS.ISSUER_SETTINGS);
   } catch (error) {
     console.error('Failed to clear issuer settings:', error);
+  }
+}
+
+/**
+ * 取引先（クライアント）情報を保存
+ */
+export function saveClientSettings(client: Client): void {
+  try {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(STORAGE_KEYS.CLIENT_SETTINGS, JSON.stringify(client));
+  } catch (error) {
+    console.error('Failed to save client settings:', error);
+  }
+}
+
+/**
+ * 保存された取引先情報を読み込み
+ */
+export function loadClientSettings(): Client | null {
+  try {
+    if (typeof window === 'undefined') return null;
+    const stored = localStorage.getItem(STORAGE_KEYS.CLIENT_SETTINGS);
+    if (!stored) return null;
+    return JSON.parse(stored) as Client;
+  } catch (error) {
+    console.error('Failed to load client settings:', error);
+    return null;
+  }
+}
+
+/**
+ * 取引先情報を削除
+ */
+export function clearClientSettings(): void {
+  try {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(STORAGE_KEYS.CLIENT_SETTINGS);
+  } catch (error) {
+    console.error('Failed to clear client settings:', error);
+  }
+}
+
+/**
+ * クライアント情報保存の無効化フラグを設定
+ */
+export function setSaveClientDisabled(disabled: boolean): void {
+  try {
+    if (typeof window === 'undefined') return;
+    if (disabled) {
+      localStorage.setItem(STORAGE_KEYS.SAVE_CLIENT_DISABLED, 'true');
+      // 無効にした時点で保存済みクライアント情報も削除
+      clearClientSettings();
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.SAVE_CLIENT_DISABLED);
+    }
+  } catch (error) {
+    console.error('Failed to set save client disabled:', error);
+  }
+}
+
+/**
+ * クライアント情報保存が無効かどうかを取得
+ */
+export function isSaveClientDisabled(): boolean {
+  try {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(STORAGE_KEYS.SAVE_CLIENT_DISABLED) === 'true';
+  } catch (error) {
+    console.error('Failed to get save client disabled:', error);
+    return false;
   }
 }

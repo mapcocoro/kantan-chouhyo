@@ -55,18 +55,33 @@ export default function IssuerFields({ docType, issuer, onChange }: Props) {
 
   const getTitle = () => {
     const titleMap: Record<DocumentType, string> = {
-      estimate: '発行者（自社）',
-      invoice: '請求者（自社）',
-      purchaseOrder: '発注者（自社）',
-      receipt: '領収者（自社）',
-      outsourcingContract: '委託者（自社）'
+      estimate: '発行者',
+      invoice: '発行者',
+      purchaseOrder: '発注者',
+      receipt: '発行者'
     };
-    return titleMap[docType] || '発行者（自社）';
+    return titleMap[docType] || '発行者';
   };
+
+  const getTooltipContent = () => {
+    if (docType === 'purchaseOrder') {
+      return '仕事を依頼し、代金を支払う側です';
+    }
+    return null;
+  };
+
+  const tooltipContent = getTooltipContent();
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-slate-700">{getTitle()}</h3>
+      <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-1">
+        {getTitle()}
+        {tooltipContent && (
+          <Tooltip content={tooltipContent}>
+            <span className="inline-block w-3 h-3 rounded-full bg-slate-400 text-white text-[10px] leading-3 text-center cursor-help">?</span>
+          </Tooltip>
+        )}
+      </h3>
       
       <div className="space-y-1">
         <label className="block text-xs font-medium text-slate-600">
